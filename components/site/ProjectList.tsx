@@ -10,10 +10,12 @@ import {
   useSpring,
   type MotionValue,
 } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { accentOf, readableOn } from "@/lib/color";
 import type { Project, Technology } from "@/lib/data/types";
+import { hostnameOf } from "@/lib/preview";
 import { cn } from "@/lib/utils";
 import { ProjectCover } from "./ProjectCover";
 import { ProjectLinks } from "./ProjectLinks";
@@ -21,7 +23,17 @@ import { SectionHeading } from "./SectionHeading";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-/** Imagen/video que sigue al cursor sobre la lista (solo desktop). */
+/** Qué se muestra al pasar el cursor: video (si se configuró) → captura de la home → portada. */
+function previewOf(p: Project) {
+  if (p.previewVideoUrl) return { kind: "video" as const, src: p.previewVideoUrl };
+  if (p.sitePreviewUrl) return { kind: "site" as const, src: p.sitePreviewUrl };
+  return { kind: "cover" as const, src: p.coverUrl };
+}
+
+/**
+ * Vista previa que sigue al cursor sobre la lista (solo desktop).
+ * Si el proyecto tiene sitio en vivo, muestra la home dentro de un marco de navegador.
+ */
 function FloatingPreview({
   projects,
   activeId,
@@ -33,6 +45,10 @@ function FloatingPreview({
   x: MotionValue<number>;
   y: MotionValue<number>;
 }) {
+  const [failed, setFailed] = useState<Set<number>>(() => new Set());
+  const active = projects.find((p) => p.id === activeId);
+  const activeIsSite = active ? previewOf(active).kind === "site" && !failed.has(active.id) : false;
+
   return (
     <motion.div
       aria-hidden
@@ -40,34 +56,66 @@ function FloatingPreview({
       style={{ x, y, translateX: "-50%", translateY: "-50%" }}
     >
       <motion.div
-        className="relative aspect-[4/3] w-[clamp(18rem,26vw,26rem)] overflow-hidden rounded-2xl bg-ink-3 shadow-2xl shadow-black/60"
+        className="w-[clamp(20rem,30vw,30rem)] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-2xl shadow-black/60"
         initial={false}
         animate={{ scale: activeId ? 1 : 0.4, opacity: activeId ? 1 : 0, rotate: activeId ? 0 : -6 }}
         transition={{ duration: 0.5, ease }}
       >
-        {projects.map((p) => {
-          const active = p.id === activeId;
-          return (
-            <div
-              key={p.id}
-              className="absolute inset-0 transition-[opacity,transform] duration-500 ease-out-expo"
-              style={{ opacity: active ? 1 : 0, transform: active ? "scale(1)" : "scale(1.15)" }}
-            >
-              <ProjectCover title={p.title} coverUrl={p.coverUrl} accentColor={p.accentColor} sizes="26rem" />
-              {active && p.previewVideoUrl && (
-                <video
-                  src={p.previewVideoUrl}
-                  className="absolute inset-0 size-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                />
-              )}
-            </div>
-          );
-        })}
+        {/* Barra de navegador (solo para la captura del sitio) */}
+        <div
+          className={cn(
+            "flex items-center gap-3 border-b border-line bg-ink-3 px-3 transition-[height,opacity] duration-300",
+            activeIsSite ? "h-8 opacity-100" : "h-0 border-b-0 opacity-0",
+          )}
+        >
+          <span className="flex gap-1.5">
+            <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+            <span className="size-2.5 rounded-full bg-[#febc2e]" />
+            <span className="size-2.5 rounded-full bg-[#28c840]" />
+          </span>
+          <span className="flex-1 truncate rounded-md bg-ink-2 px-2.5 py-0.5 text-center font-mono text-[0.65rem] text-muted">
+            {active?.liveUrl ? hostnameOf(active.liveUrl) : ""}
+          </span>
+        </div>
+
+        <div className="relative aspect-[16/10]">
+          {projects.map((p) => {
+            const isActive = p.id === activeId;
+            const preview = previewOf(p);
+            return (
+              <div
+                key={p.id}
+                className="absolute inset-0 transition-[opacity,transform] duration-500 ease-out-expo"
+                style={{ opacity: isActive ? 1 : 0, transform: isActive ? "scale(1)" : "scale(1.1)" }}
+              >
+                {/* Fondo mientras carga la captura (o si falla) */}
+                <ProjectCover title={p.title} coverUrl={preview.kind === "site" ? null : p.coverUrl} accentColor={p.accentColor} sizes="30rem" />
+                {preview.kind === "site" && !failed.has(p.id) && (
+                  <Image
+                    src={preview.src}
+                    alt=""
+                    fill
+                    sizes="30rem"
+                    unoptimized
+                    className="object-cover object-top"
+                    onError={() => setFailed((prev) => new Set(prev).add(p.id))}
+                  />
+                )}
+                {isActive && preview.kind === "video" && (
+                  <video
+                    src={preview.src}
+                    className="absolute inset-0 size-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -131,7 +179,6 @@ function ProjectRow({
           <h3 className="text-display text-[clamp(2.25rem,5vw,4.75rem)] transition-transform duration-500 ease-out-expo group-hover:translate-x-3">
             <Link
               href={href}
-              data-cursor="Ver"
               className="outline-none after:absolute after:inset-0 after:content-[''] focus-visible:underline"
             >
               {project.title}

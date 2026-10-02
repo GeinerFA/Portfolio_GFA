@@ -60,6 +60,8 @@ export interface Project {
   gallery: string[];
   repoUrl: string | null;
   liveUrl: string | null;
+  /** Captura automática de la home de liveUrl (calculada, no se guarda en la base). */
+  sitePreviewUrl: string | null;
   year: number;
   accentColor: string;
   isFeatured: boolean;

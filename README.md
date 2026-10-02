@@ -90,7 +90,9 @@ Copia `.env.example` a `.env.local` y complétalo:
 | `AUTH_GOOGLE_SECRET` | Sí | Secreto del cliente OAuth. |
 | `ADMIN_EMAIL` | Sí | **Único** correo que puede entrar a `/admin`. No distingue mayúsculas. |
 | `NEXT_PUBLIC_SITE_URL` | No | URL pública del sitio, para SEO, sitemap y Open Graph. En Vercel se detecta sola. |
-| `BLOB_READ_WRITE_TOKEN` | No | Solo si más adelante activas la subida de imágenes con Vercel Blob. |
+| `CLOUDINARY_CLOUD_NAME` | No | Cloudinary, para subir imágenes desde el admin. Sin estas tres variables, las imágenes se cargan solo por URL. |
+| `CLOUDINARY_API_KEY` | No | API key de Cloudinary. |
+| `CLOUDINARY_API_SECRET` | No | API secret de Cloudinary (nunca se expone al navegador). |
 
 > `.env` y `.env.local` están en `.gitignore`. **Nunca** subas tus secretos al repositorio.
 
@@ -150,6 +152,10 @@ Entra a `/admin` e inicia sesión con Google. Solo el correo de `ADMIN_EMAIL` ti
   - Puedes publicar o despublicar, destacar y ordenar con ↑/↓.
   - Borrar pide confirmación.
   - Los proyectos nuevos se crean como **borrador** hasta que marques "Publicado".
+  - **Vista previa del sitio:** si el proyecto tiene "Sitio en vivo", al pasar el cursor por la lista se muestra una captura automática de su home dentro de un marco de navegador. Si tiene video de preview, se usa el video. Si la portada está vacía (o es la misma URL del sitio), también se usa la captura como portada.
+    - Las capturas las genera [Microlink](https://microlink.io), cuyo plan gratuito permite unas 50 por día.
+    - Se sirven desde `/api/preview/[slug]` con caché de 1 día, así que casi no consumen ese límite. Solo funcionan para proyectos publicados.
+    - Si el sitio cambia, la captura se actualiza en un máximo de 24 h.
 - **Tecnologías:** nombre, slug, categoría, ícono, color de marca y orden.
   - **Ícono:** escribe un nombre de [Simple Icons](https://react-icons.github.io/react-icons/icons/si/) (`SiReact` o simplemente `react`) o la URL de una imagen. Si lo dejas vacío, se muestra un badge con el nombre.
 - **Perfil:** nombre, rol, titular, bio, correo, ubicación, foto, disponibilidad y **link del CV**.
@@ -159,14 +165,22 @@ Entra a `/admin` e inicia sesión con Google. Solo el correo de `ADMIN_EMAIL` ti
 
 Al guardar cualquier cambio, se revalidan todas las páginas públicas (home, detalles, sitemap y OG). Además, como respaldo, se regeneran cada hora.
 
-### Imágenes y Vercel Blob
+### Imágenes con Cloudinary
 
-Por ahora las imágenes se cargan **por URL**: pega URLs públicas `https://…` o rutas de `public/`. Para habilitar la subida de archivos más adelante, sigue los pasos documentados en [`lib/storage.ts`](lib/storage.ts):
+En **Perfil → Foto de perfil** y en la **portada** de cada proyecto hay un botón **Subir imagen**. También puedes pegar una URL `https://…` o una ruta de `public/`.
 
-1. Instala `@vercel/blob`.
-2. Crea un Blob Store en Vercel.
-3. Implementa `uploadImage()`.
-4. Agrega un botón de subida a `ImageUrlField`.
+**Configurar Cloudinary:**
+
+1. Crea una cuenta gratis en [cloudinary.com](https://cloudinary.com).
+2. En **Settings → API Keys**, copia el **Cloud name**, la **API Key** y el **API Secret**.
+3. Agrégalos a `.env.local` (y en Vercel) como `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`.
+4. Reinicia el servidor.
+
+**Cómo funciona:**
+
+- El archivo se sube **directo desde el navegador a Cloudinary**, con una firma que genera el servidor y que solo el admin puede pedir. Se guarda en las carpetas `portfolio/perfil` o `portfolio/proyectos`.
+- Se aceptan JPG, PNG, WebP, AVIF y GIF, de hasta 10 MB.
+- Después de subir, pulsa **Guardar**. Las imágenes reemplazadas no se borran de Cloudinary; puedes eliminarlas desde su Media Library.
 
 ---
 
@@ -174,7 +188,7 @@ Por ahora las imágenes se cargan **por URL**: pega URLs públicas `https://…`
 
 ```
 app/
-├─ (site)/                 Sitio público (Lenis, preloader, cursor, navbar, footer)
+├─ (site)/                 Sitio público (Lenis, navbar, footer)
 │  ├─ page.tsx             Home: Hero, Marquee, Tecnologías, Destacados, Proyectos, Sobre mí, Contacto
 │  ├─ template.tsx         Transición entre páginas
 │  ├─ proyectos/[slug]/    Detalle del proyecto
@@ -187,13 +201,13 @@ app/
 components/
 ├─ site/                   Secciones del sitio público
 ├─ admin/                  Formularios y controles del panel
-└─ motion/                 Animaciones reutilizables (SplitText, Reveal, Magnetic, Cursor…)
+└─ motion/                 Animaciones reutilizables (SplitText, Reveal, Magnetic, ClipReveal…)
 lib/
 ├─ db/                     Cliente Drizzle (Neon HTTP), schema y relaciones (de drizzle-kit pull)
 ├─ data/                   Tipos de dominio, consultas públicas/admin, mappers y datos por defecto
 ├─ actions/                Server Actions (todas validan al admin)
 ├─ auth.ts · auth-guard.ts Auth.js y validación de ADMIN_EMAIL
-└─ storage.ts              Punto de extensión para Vercel Blob
+└─ cloudinary.ts           Firma de subidas a Cloudinary
 ```
 
 ---
@@ -224,4 +238,4 @@ Revisa que `ADMIN_EMAIL` sea exactamente el correo de esa cuenta de Google y rei
 Falta la URI `https://TU-DOMINIO/api/auth/callback/google` en el cliente OAuth de Google.
 
 **Accesibilidad y movimiento.**
-Si el sistema tiene activado "reducir movimiento", se desactivan el preloader, el smooth scroll, el cursor personalizado, el parallax y las animaciones de texto.
+Si el sistema tiene activado "reducir movimiento", se desactivan el smooth scroll, las transiciones de página, el parallax y las animaciones de texto.

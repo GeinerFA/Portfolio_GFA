@@ -1,6 +1,5 @@
-import { Cursor } from "@/components/motion/Cursor";
-import { Preloader } from "@/components/motion/Preloader";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { BackToTop } from "@/components/site/BackToTop";
 import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import type { Metadata } from "next";
@@ -31,12 +30,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       >
         Saltar al contenido
       </a>
-      <Preloader label={profile.fullName} />
-      <Cursor />
       <Navbar name={profile.fullName} cvUrl={profile.cvUrl} />
-      <div id="top" />
       <main id="contenido">{children}</main>
       <Footer name={profile.fullName} />
+      <BackToTop />
     </SmoothScroll>
   );
 }

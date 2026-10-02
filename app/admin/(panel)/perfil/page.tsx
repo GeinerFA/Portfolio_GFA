@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ProfileForm } from "@/components/admin/ProfileForm";
+import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { getAdminProfile } from "@/lib/data/admin";
 
 export const metadata = { title: "Perfil" };
@@ -9,7 +10,7 @@ export default async function AdminProfilePage() {
   return (
     <>
       <PageHeader title="Perfil" description="Datos que aparecen en el Hero, Sobre mí, Contacto y SEO." />
-      <ProfileForm profile={profile} />
+      <ProfileForm profile={profile} uploadEnabled={isCloudinaryConfigured()} />
     </>
   );
 }

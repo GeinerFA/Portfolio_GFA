@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 import { DeleteProjectButton } from "@/components/admin/ProjectRowActions";
+import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { getAdminProject, getAdminTechnologies } from "@/lib/data/admin";
 
 export const metadata = { title: "Editar proyecto" };
@@ -49,7 +50,7 @@ export default async function EditProjectPage({ params, searchParams }: Props) {
           Proyecto creado. Puedes seguir editándolo.
         </p>
       )}
-      <ProjectForm key={project.id} project={project} technologies={technologies} />
+      <ProjectForm key={project.id} project={project} technologies={technologies} uploadEnabled={isCloudinaryConfigured()} />
     </>
   );
 }

@@ -5,7 +5,7 @@ import type { Profile } from "@/lib/data/types";
 import { ImageUrlField } from "./fields";
 import { Card, Field, FormMessage, SubmitButton, Switch, fieldProps, inputClass, useActionForm } from "./form";
 
-export function ProfileForm({ profile }: { profile: Profile }) {
+export function ProfileForm({ profile, uploadEnabled }: { profile: Profile; uploadEnabled: boolean }) {
   const { state, pending, onSubmit } = useActionForm(saveProfile);
   const errors = state.errors;
 
@@ -35,8 +35,19 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <Switch name="isAvailable" label="Disponible para proyectos" description='Muestra el badge con pulso en el Hero.' defaultChecked={profile.isAvailable} />
       </Card>
 
-      <Card title="Archivos">
-        <ImageUrlField name="avatarUrl" label="Foto (opcional)" defaultValue={profile.avatarUrl} errors={errors} />
+      <Card title="Foto de perfil" description="Aparece al inicio de la página (Hero) y en Sobre mí. Ideal: foto vertical.">
+        <ImageUrlField
+          name="avatarUrl"
+          label="Foto"
+          defaultValue={profile.avatarUrl}
+          errors={errors}
+          preview="portrait"
+          upload={{ folder: "avatar", enabled: uploadEnabled }}
+          hint="Sube una imagen o pega una URL. Se recorta en proporción 4:5. Vacío = no se muestra foto."
+        />
+      </Card>
+
+      <Card title="CV">
         <Field
           label="Link del CV"
           name="cvUrl"

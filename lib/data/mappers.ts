@@ -1,3 +1,4 @@
+import { sitePreviewPath } from "@/lib/preview";
 import type { projects, profile, socialLinks, technologies } from "@/lib/db/schema";
 import type { Profile, Project, SocialLink, Technology } from "./types";
 
@@ -31,6 +32,7 @@ export function toTechnology(row: TechRow): Technology {
 }
 
 export function toProject(row: ProjectRow, techs: TechRow[]): Project {
+  const liveUrl = blankToNull(row.liveUrl);
   return {
     id: row.id,
     slug: row.slug,
@@ -41,7 +43,8 @@ export function toProject(row: ProjectRow, techs: TechRow[]): Project {
     previewVideoUrl: blankToNull(row.previewVideoUrl),
     gallery: Array.isArray(row.gallery) ? row.gallery.filter((u): u is string => typeof u === "string" && !!u.trim()) : [],
     repoUrl: blankToNull(row.repoUrl),
-    liveUrl: blankToNull(row.liveUrl),
+    liveUrl,
+    sitePreviewUrl: liveUrl && /^https?:\/\//i.test(liveUrl) ? sitePreviewPath(row.slug) : null,
     year: row.year,
     accentColor: row.accentColor,
     isFeatured: row.isFeatured,

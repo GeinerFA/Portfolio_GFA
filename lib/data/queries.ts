@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_rethrow } from "next/navigation";
 import { cache } from "react";
 import { hasDatabase } from "@/lib/env";
 import { defaultSiteData } from "./defaults";
@@ -14,6 +15,8 @@ export const getSiteData = cache(async (): Promise<SiteData> => {
   try {
     return await loadSiteData();
   } catch (error) {
+    // Deja pasar los errores internos de Next (p. ej. el cambio a render dinámico).
+    unstable_rethrow(error);
     const reason = error instanceof Error ? (error.cause instanceof Error ? error.cause.message : error.message) : String(error);
     console.error(`[data] No se pudo leer la base de datos; usando datos por defecto. Motivo: ${reason}`);
     return defaultSiteData;

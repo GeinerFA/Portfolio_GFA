@@ -1,4 +1,6 @@
 import { ArrowDown, MapPin } from "lucide-react";
+import Image from "next/image";
+import { ClipReveal } from "@/components/motion/ClipReveal";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
 import type { Profile, SocialLink } from "@/lib/data/types";
@@ -15,7 +17,8 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
       />
 
       <div className="container-x relative">
-        <Reveal delay={0.2} y={20} className="mb-8 flex flex-wrap items-center gap-3 md:mb-12">
+        <div className="mb-8 flex items-end justify-between gap-6 md:mb-12">
+        <Reveal delay={0.2} y={20} className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           {profile.isAvailable && (
             <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-ink-2/80 px-4 py-2 text-sm">
               <span className="relative flex size-2.5">
@@ -32,6 +35,23 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
             </span>
           )}
         </Reveal>
+
+          {profile.avatarUrl && (
+            <ClipReveal
+              delay={0.35}
+              className="relative aspect-[4/5] w-[clamp(6.5rem,26vw,9rem)] shrink-0 overflow-hidden rounded-2xl bg-ink-3 md:w-[clamp(11rem,17vw,17rem)] md:rounded-3xl"
+            >
+              <Image
+                src={profile.avatarUrl}
+                alt={`Foto de ${profile.fullName}`}
+                fill
+                priority
+                sizes="(min-width: 768px) 17vw, 26vw"
+                className="object-cover"
+              />
+            </ClipReveal>
+          )}
+        </div>
 
         <h1 className="text-display text-[clamp(3.25rem,13.5vw,14rem)]">
           <SplitText text={profile.fullName} delay={0.15} />

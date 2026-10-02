@@ -26,3 +26,14 @@ export function toDownloadUrl(url: string): string {
   const id = url.match(/\/file\/d\/([\w-]+)/)?.[1] ?? new URL(url).searchParams.get("id");
   return id ? `https://drive.google.com/uc?export=download&id=${id}` : url;
 }
+
+/** Iniciales de un nombre: "Geiner Fallas Araya" → "GFA" (máximo 3 letras). */
+export function initials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map((word) => word[0] ?? "")
+    .join("")
+    .slice(0, 3)
+    .toUpperCase();
+}

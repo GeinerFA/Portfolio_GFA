@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { accentOf, readableOn } from "@/lib/color";
+import { isSitePreview } from "@/lib/preview";
 import { cn } from "@/lib/utils";
 
 /**
@@ -29,7 +30,9 @@ export function ProjectCover({
         fill
         sizes={sizes}
         priority={priority}
-        className={cn("object-cover", className)}
+        // Las capturas de sitios ya vienen livianas: se sirven directo y alineadas arriba (inicio de la página).
+        unoptimized={isSitePreview(coverUrl)}
+        className={cn("object-cover", isSitePreview(coverUrl) && "object-top", className)}
       />
     );
   }

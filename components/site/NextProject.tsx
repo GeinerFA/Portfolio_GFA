@@ -11,7 +11,6 @@ export function NextProject({ project }: { project: Project }) {
     <section className="border-t border-line">
       <Link
         href={`/proyectos/${project.slug}`}
-        data-cursor="Ver"
         className="group relative block overflow-hidden"
         style={{ ["--accent" as string]: accent, ["--on-accent" as string]: readableOn(accent) }}
       >

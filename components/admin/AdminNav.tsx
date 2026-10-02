@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, ExternalLink, FolderKanban, LayoutDashboard, LogOut, Menu, Share2, UserRound, X } from "lucide-react";
+import { Cpu, FolderKanban, House, LayoutDashboard, LogOut, Menu, Share2, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -87,11 +87,10 @@ export function AdminNav({
           </ul>
           <Link
             href="/"
-            target="_blank"
             className="mt-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted hover:text-paper"
           >
-            <ExternalLink className="size-4" aria-hidden />
-            Ver sitio
+            <House className="size-4" aria-hidden />
+            Home
           </Link>
         </nav>
 

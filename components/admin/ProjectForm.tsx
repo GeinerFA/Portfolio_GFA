@@ -7,7 +7,15 @@ import { ColorField, GalleryField, ImageUrlField, TitleSlugFields } from "./fiel
 import { Card, Field, FormMessage, SubmitButton, Switch, fieldProps, inputClass, useActionForm } from "./form";
 import { TechMultiSelect } from "./TechMultiSelect";
 
-export function ProjectForm({ project, technologies }: { project?: Project; technologies: Technology[] }) {
+export function ProjectForm({
+  project,
+  technologies,
+  uploadEnabled,
+}: {
+  project?: Project;
+  technologies: Technology[];
+  uploadEnabled: boolean;
+}) {
   const { state, pending, onSubmit } = useActionForm(saveProject);
   const errors = state.errors;
 
@@ -37,8 +45,15 @@ export function ProjectForm({ project, technologies }: { project?: Project; tech
           </div>
         </Card>
 
-        <Card title="Multimedia" description="Imágenes por URL. Más adelante se podrá subir archivos con Vercel Blob.">
-          <ImageUrlField name="coverUrl" label="Portada" defaultValue={project?.coverUrl} errors={errors} />
+        <Card title="Multimedia" description="Sube imágenes a Cloudinary o pega URLs.">
+          <ImageUrlField
+            name="coverUrl"
+            label="Portada"
+            defaultValue={project?.coverUrl}
+            errors={errors}
+            upload={{ folder: "projects", enabled: uploadEnabled }}
+            hint="URL de una imagen (https://… o /archivo.jpg). Si la dejas vacía y hay sitio en vivo, se usa una captura automática de su home."
+          />
           <ImageUrlField
             name="previewVideoUrl"
             label="Video de preview (opcional)"

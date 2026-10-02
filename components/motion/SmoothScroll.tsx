@@ -8,7 +8,16 @@ function ScrollToTopOnRouteChange() {
   const pathname = usePathname();
   const lenis = useLenis();
   useEffect(() => {
-    lenis?.scrollTo(0, { immediate: true });
+    if (!lenis) return;
+    // Si la URL trae un ancla (p. ej. "/#proyectos" desde otra página), ir a esa sección; si no, arriba.
+    const hash = decodeURIComponent(window.location.hash.slice(1));
+    const target = hash ? document.getElementById(hash) : null;
+    if (target) {
+      // Espera un frame para que el layout esté listo antes de medir la posición.
+      requestAnimationFrame(() => lenis.scrollTo(target, { immediate: true }));
+    } else {
+      lenis.scrollTo(0, { immediate: true });
+    }
   }, [pathname, lenis]);
   return null;
 }

@@ -1,16 +1,26 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useState } from "react";
 
 const ease = [0.76, 0, 0.24, 1] as const;
 
+// La primera carga entra directo; la animación solo se usa al navegar entre páginas.
+let hasNavigated = false;
+
 /**
- * Transición de entrada entre páginas: una cortina sube y revela el contenido.
+ * Transición entre páginas: una cortina sube y revela el contenido.
  * Se monta desde `template.tsx`, que se re-crea en cada navegación.
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
-  if (reduce) return <>{children}</>;
+  const [animate] = useState(() => hasNavigated);
+
+  useEffect(() => {
+    hasNavigated = true;
+  }, []);
+
+  if (reduce || !animate) return <>{children}</>;
 
   return (
     <>

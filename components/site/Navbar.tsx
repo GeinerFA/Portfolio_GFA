@@ -1,12 +1,12 @@
 "use client";
 
 import { useLenis } from "lenis/react";
-import { Download, Menu, X } from "lucide-react";
+import { Download, LockKeyhole, Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, initials } from "@/lib/utils";
 
 const NAV = [
   { href: "/#proyectos", label: "Proyectos" },
@@ -49,7 +49,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
     };
   }, [open, lenis]);
 
-  const first = name.split(" ")[0] ?? name;
+  const logo = initials(name) || name;
 
   return (
     <>
@@ -67,12 +67,12 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
           )}
         >
           <nav className="container-x flex h-16 items-center justify-between md:h-20" aria-label="Principal">
-            <Link href="/" className="text-display relative z-[60] text-xl tracking-tight md:text-2xl">
-              {first}
+            <Link href="/" aria-label={`${name}, ir al inicio`} className="text-display relative z-[60] text-xl tracking-tight md:text-2xl">
+              {logo}
               <span className="text-accent">.</span>
             </Link>
 
-            <ul className="hidden items-center gap-8 md:flex">
+            <ul className="hidden items-center gap-6 md:flex lg:gap-8">
               {NAV.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -92,12 +92,21 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
                   href={cvUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden items-center gap-2 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent sm:inline-flex"
+                  className="hidden items-center gap-2 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent md:inline-flex"
                 >
                   <Download className="size-4" aria-hidden />
                   Descargar CV
                 </a>
               )}
+              <Link
+                href="/admin"
+                prefetch={false}
+                aria-label="Panel administrativo"
+                title="Panel administrativo"
+                className="hidden size-10 items-center justify-center rounded-full border border-line text-paper/70 transition-colors hover:border-paper/50 hover:text-paper md:inline-flex"
+              >
+                <LockKeyhole className="size-4" aria-hidden />
+              </Link>
               <button
                 type="button"
                 onClick={() => setOpen((v) => !v)}
@@ -144,21 +153,37 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
                 </li>
               ))}
             </ul>
-            {cvUrl && (
-              <motion.a
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.45 }}
-                href={cvUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-paper px-6 py-4 font-medium text-ink"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.45 }}
+              className="flex gap-3"
+            >
+              {cvUrl && (
+                <a
+                  href={cvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-paper px-6 py-4 font-medium text-ink"
+                >
+                  <Download className="size-4" aria-hidden />
+                  Descargar CV
+                </a>
+              )}
+              <Link
+                href="/admin"
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-full border border-line py-4 font-medium text-paper/80",
+                  cvUrl ? "px-5" : "flex-1 px-6",
+                )}
               >
-                <Download className="size-4" aria-hidden />
-                Descargar CV
-              </motion.a>
-            )}
+                <LockKeyhole className="size-4" aria-hidden />
+                Panel admin
+              </Link>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

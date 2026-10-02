@@ -89,7 +89,7 @@ export default async function ProjectPage({ params }: Props) {
       </header>
 
       <ClipReveal delay={0.3} className="container-x">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-ink-3 md:aspect-[16/8]">
+        <div className="relative mx-auto aspect-[16/10] w-full max-w-[calc(80svh*1.6)] overflow-hidden rounded-2xl border border-line bg-ink-3 md:rounded-3xl">
           <ProjectCover
             title={project.title}
             coverUrl={project.coverUrl}

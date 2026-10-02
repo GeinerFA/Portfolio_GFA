@@ -57,17 +57,6 @@
   }
 }
 
-/* Cursor personalizado (solo cuando está activo en desktop) */
-html.has-custom-cursor,
-html.has-custom-cursor a,
-html.has-custom-cursor button {
-  cursor: none;
-}
-html.has-custom-cursor input,
-html.has-custom-cursor textarea {
-  cursor: text;
-}
-
 /* Marquee infinito (CSS puro, se pausa al pasar el cursor) */
 @keyframes marquee {
   from {

@@ -5,8 +5,17 @@ import { env } from "@/lib/env";
 import * as relations from "./relations";
 import * as schema from "./schema";
 
+/**
+ * Tag de caché de todas las consultas. El driver HTTP de Neon usa fetch, y Next guarda esas respuestas
+ * en su Data Cache cuando la página es estática (ISR). Las Server Actions del admin llaman a
+ * updateTag(DB_CACHE_TAG) al guardar, así el sitio nunca sirve datos viejos tras un cambio.
+ * (Las páginas del admin son force-dynamic: siempre leen datos frescos.)
+ */
+export const DB_CACHE_TAG = "db";
+
 function createDb(url: string) {
-  return drizzle({ client: neon(url), schema: { ...schema, ...relations } });
+  const client = neon(url, { fetchOptions: { next: { tags: [DB_CACHE_TAG] } } });
+  return drizzle({ client, schema: { ...schema, ...relations } });
 }
 
 export type Database = ReturnType<typeof createDb>;

@@ -1,11 +1,16 @@
 import "server-only";
 import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
+import { sameUrl } from "@/lib/preview";
 import { toDownloadUrl } from "@/lib/utils";
 import { profile, projects, socialLinks, technologies } from "@/lib/db/schema";
 import { defaultProfile } from "./defaults";
 import { toProfile, toProject, toSocial, toTechnology } from "./mappers";
-import type { Profile, SiteData } from "./types";
+import type { Profile, Project, SiteData } from "./types";
+
+/** Sin portada (o si la portada es la misma URL del sitio), usa la captura automática de la home. */
+const withCoverFallback = (p: Project): Project =>
+  !p.coverUrl || sameUrl(p.coverUrl, p.liveUrl) ? { ...p, coverUrl: p.sitePreviewUrl } : p;
 
 const withDownloadableCv = (p: Profile): Profile => ({ ...p, cvUrl: p.cvUrl ? toDownloadUrl(p.cvUrl) : null });
 
@@ -39,6 +44,6 @@ export async function loadSiteData(): Promise<SiteData> {
     profile: withDownloadableCv(profileRows[0] ? toProfile(profileRows[0]) : defaultProfile),
     socials: socialRows.filter((s) => s.url.trim()).map(toSocial),
     technologies: techRows.map((t) => ({ ...toTechnology(t), projectCount: usage.get(t.id) ?? 0 })),
-    projects: projectList,
+    projects: projectList.map(withCoverFallback),
   };
 }

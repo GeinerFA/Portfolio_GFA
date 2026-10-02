@@ -1,15 +1,16 @@
 import "server-only";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { UnauthorizedError, requireAdmin } from "@/lib/auth-guard";
-import { db, type Database } from "@/lib/db";
+import { DB_CACHE_TAG, db, type Database } from "@/lib/db";
 
 import type { ActionState } from "./state";
 
 export type { ActionState };
 
-/** Revalida todo el sitio público (home, detalles, sitemap y OG) tras un cambio. */
+/** Invalida las consultas cacheadas y revalida todo el sitio público (home, detalles, sitemap y OG). */
 export function revalidateSite() {
+  updateTag(DB_CACHE_TAG);
   revalidatePath("/", "layout");
 }
 
