@@ -3,10 +3,11 @@
 import { useLenis } from "lenis/react";
 import { Download, LockKeyhole, Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { cn, initials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/#proyectos", label: "Proyectos" },
@@ -49,8 +50,6 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
     };
   }, [open, lenis]);
 
-  const logo = initials(name) || name;
-
   return (
     <>
       <motion.header
@@ -67,9 +66,8 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
           )}
         >
           <nav className="container-x flex h-16 items-center justify-between md:h-20" aria-label="Principal">
-            <Link href="/" aria-label={`${name}, ir al inicio`} className="text-display relative z-[60] text-xl tracking-tight md:text-2xl">
-              {logo}
-              <span className="text-accent">.</span>
+            <Link href="/" aria-label={`${name}, ir al inicio`} className="relative z-[60] block transition-opacity hover:opacity-80">
+              <Image src="/logo.png" alt="" width={427} height={160} priority className="h-7 w-auto md:h-9" />
             </Link>
 
             <ul className="hidden items-center gap-6 md:flex lg:gap-8">

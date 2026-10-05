@@ -8,12 +8,15 @@ export function ProjectLinks({
   liveUrl,
   title,
   size = "md",
+  tone = "default",
   className,
 }: {
   repoUrl: string | null;
   liveUrl: string | null;
   title: string;
   size?: "sm" | "md" | "lg";
+  /** "onAccent": para fondos de color (fila resaltada); el hover usa tinta en vez del color de acento. */
+  tone?: "default" | "onAccent";
   className?: string;
 }) {
   if (!repoUrl && !liveUrl) return null;
@@ -33,7 +36,12 @@ export function ProjectLinks({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Ver código de ${title} en GitHub (abre en pestaña nueva)`}
-          className={cn(base, "border-current/30 hover:border-paper hover:bg-paper hover:text-ink")}
+          className={cn(
+            base,
+            tone === "onAccent"
+              ? "border-current/30 hover:border-ink hover:bg-ink hover:text-paper"
+              : "border-current/30 hover:border-paper hover:bg-paper hover:text-ink",
+          )}
         >
           <FaGithub aria-hidden className="size-[1.1em]" />
           Ver código
@@ -45,7 +53,11 @@ export function ProjectLinks({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Ver sitio de ${title} (abre en pestaña nueva)`}
-          className={cn(base, "border-paper bg-paper text-ink hover:border-accent hover:bg-accent")}
+          className={cn(
+            base,
+            "border-paper bg-paper text-ink",
+            tone === "onAccent" ? "hover:border-ink hover:bg-ink hover:text-paper" : "hover:border-accent hover:bg-accent",
+          )}
         >
           Ver sitio
           <ArrowUpRight

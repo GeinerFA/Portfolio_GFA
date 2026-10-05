@@ -12,7 +12,7 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { accentOf, readableOn } from "@/lib/color";
 import type { Project, Technology } from "@/lib/data/types";
 import { hostnameOf } from "@/lib/preview";
@@ -37,13 +37,18 @@ function previewOf(p: Project) {
 function FloatingPreview({
   projects,
   activeId,
+  shown,
   x,
   y,
+  boxRef,
 }: {
   projects: Project[];
   activeId: number | null;
+  /** false mientras el cursor está sobre los botones, para no taparlos. */
+  shown: boolean;
   x: MotionValue<number>;
   y: MotionValue<number>;
+  boxRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [failed, setFailed] = useState<Set<number>>(() => new Set());
   const active = projects.find((p) => p.id === activeId);
@@ -53,13 +58,14 @@ function FloatingPreview({
     <motion.div
       aria-hidden
       className="pointer-events-none fixed left-0 top-0 z-30 hidden md:block"
-      style={{ x, y, translateX: "-50%", translateY: "-50%" }}
+      style={{ x, y }}
     >
       <motion.div
+        ref={boxRef}
         className="w-[clamp(20rem,30vw,30rem)] overflow-hidden rounded-2xl border border-line bg-ink-2 shadow-2xl shadow-black/60"
         initial={false}
-        animate={{ scale: activeId ? 1 : 0.4, opacity: activeId ? 1 : 0, rotate: activeId ? 0 : -6 }}
-        transition={{ duration: 0.5, ease }}
+        animate={{ scale: shown ? 1 : 0.6, opacity: shown ? 1 : 0, rotate: shown ? 0 : -4 }}
+        transition={{ duration: shown ? 0.5 : 0.25, ease }}
       >
         {/* Barra de navegador (solo para la captura del sitio) */}
         <div
@@ -184,15 +190,15 @@ function ProjectRow({
               {project.title}
             </Link>
           </h3>
+          {/* El espacio de las tecnologías siempre está reservado: así la fila no cambia de alto
+              al pasar el cursor y los botones no se mueven mientras intentas hacer clic. */}
           <div
             className={cn(
-              "grid transition-[grid-template-rows,opacity] duration-500 ease-out-expo",
-              active ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+              "transition-[opacity,transform] duration-500 ease-out-expo",
+              active ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
             )}
           >
-            <div className="overflow-hidden">
-              <TechChips techs={project.technologies} className="pt-4" />
-            </div>
+            <TechChips techs={project.technologies} className="pt-4" />
           </div>
         </div>
 
@@ -200,13 +206,17 @@ function ProjectRow({
 
         <span className="relative col-span-1 font-mono text-sm opacity-70">{project.year}</span>
 
-        <ProjectLinks
-          repoUrl={project.repoUrl}
-          liveUrl={project.liveUrl}
-          title={project.title}
-          size="sm"
-          className="relative col-span-4 justify-end lg:col-span-3"
-        />
+        {/* data-no-preview: la vista previa se oculta sobre los botones para no taparlos */}
+        <div data-no-preview className="relative col-span-4 flex justify-end lg:col-span-3">
+          <ProjectLinks
+            repoUrl={project.repoUrl}
+            liveUrl={project.liveUrl}
+            title={project.title}
+            size="sm"
+            tone={active ? "onAccent" : "default"}
+            className="justify-end"
+          />
+        </div>
       </div>
 
       {/* ── Móvil: tarjeta ──────────────────────────── */}
@@ -238,6 +248,8 @@ export function ProjectList({ projects }: { projects: Project[] }) {
   const reduce = useReducedMotion();
   const [filter, setFilter] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [overLinks, setOverLinks] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -308,10 +320,24 @@ export function ProjectList({ projects }: { projects: Project[] }) {
         className="relative mt-10"
         onPointerMove={(e) => {
           if (e.pointerType !== "mouse") return;
-          mouseX.set(e.clientX);
-          mouseY.set(e.clientY);
+          const target = e.target instanceof Element ? e.target : null;
+          setOverLinks(Boolean(target?.closest("[data-no-preview]")));
+          // La vista previa va al costado del cursor (nunca debajo): a la derecha en la mitad
+          // izquierda de la pantalla y a la izquierda en la mitad derecha. Siempre dentro de la ventana.
+          const w = previewRef.current?.offsetWidth ?? 480;
+          const h = previewRef.current?.offsetHeight ?? 320;
+          const gap = 32;
+          const margin = 16;
+          const toRight = e.clientX < window.innerWidth / 2;
+          const px = toRight ? e.clientX + gap : e.clientX - gap - w;
+          const py = e.clientY - h / 2;
+          mouseX.set(Math.min(Math.max(px, margin), window.innerWidth - w - margin));
+          mouseY.set(Math.min(Math.max(py, margin), window.innerHeight - h - margin));
         }}
-        onPointerLeave={() => setActiveId(null)}
+        onPointerLeave={() => {
+          setActiveId(null);
+          setOverLinks(false);
+        }}
       >
         <div className="hidden grid-cols-12 gap-6 border-b border-line px-4 pb-4 font-mono text-xs uppercase tracking-widest text-muted md:grid lg:px-6">
           <span className="col-span-1">#</span>
@@ -333,7 +359,14 @@ export function ProjectList({ projects }: { projects: Project[] }) {
 
         {visible.length === 0 && <p className="py-16 text-center text-muted">No hay proyectos con esa tecnología.</p>}
 
-        <FloatingPreview projects={visible} activeId={activeId} x={x} y={y} />
+        <FloatingPreview
+          projects={visible}
+          activeId={activeId}
+          shown={activeId !== null && !overLinks}
+          x={x}
+          y={y}
+          boxRef={previewRef}
+        />
       </div>
     </section>
   );
