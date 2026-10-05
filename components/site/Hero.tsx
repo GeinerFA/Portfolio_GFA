@@ -53,7 +53,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
           )}
         </div>
 
-        <h1 className="text-display text-[clamp(3.25rem,13.5vw,14rem)]">
+        <h1 className="text-display text-[clamp(2.75rem,10.5vw,11rem)]">
           <SplitText text={profile.fullName} delay={0.15} />
         </h1>
 

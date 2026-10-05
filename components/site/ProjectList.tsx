@@ -220,25 +220,45 @@ function ProjectRow({
       </div>
 
       {/* ── Móvil: tarjeta ──────────────────────────── */}
-      <article className="py-6 md:hidden">
-        <Link href={href} className="block">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-ink-3">
-            <ProjectCover title={project.title} coverUrl={project.coverUrl} accentColor={project.accentColor} sizes="100vw" />
-            <span
-              className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full"
-              style={{ background: accent, color: onAccent }}
-            >
-              <ArrowUpRight className="size-5" aria-hidden />
-            </span>
+      {/* Fila compacta tipo lista (distinta de las tarjetas de Destacados). */}
+      <article className="relative py-5 md:hidden">
+        <div className="flex gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2.5 font-mono text-[0.7rem] text-muted">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span className="h-px w-5" style={{ background: accent }} />
+              <span>{project.year}</span>
+            </div>
+            <h3 className="text-display mt-2 text-[1.75rem] leading-[1.05]">
+              <Link href={href} className="after:absolute after:inset-0 after:content-['']">
+                {project.title}
+              </Link>
+            </h3>
+            {project.summary && <p className="mt-2 line-clamp-2 text-sm text-paper/60">{project.summary}</p>}
           </div>
-          <div className="mt-4 flex items-baseline justify-between gap-4">
-            <h3 className="text-display text-4xl">{project.title}</h3>
-            <span className="font-mono text-sm text-muted">{project.year}</span>
+
+          <div className="relative mt-1 aspect-[16/10] w-24 shrink-0 self-start overflow-hidden rounded-lg border border-line bg-ink-3">
+            <ProjectCover title={project.title} coverUrl={project.coverUrl} accentColor={project.accentColor} sizes="96px" />
           </div>
-          {project.summary && <p className="mt-2 text-sm text-paper/60">{project.summary}</p>}
-        </Link>
-        <TechChips techs={project.technologies} className="mt-4 text-paper/70" />
-        <ProjectLinks repoUrl={project.repoUrl} liveUrl={project.liveUrl} title={project.title} className="mt-5" />
+        </div>
+
+        {project.technologies.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-1.5 text-paper/70">
+            {project.technologies.slice(0, 3).map((t) => (
+              <li key={t.id} className="rounded-full border border-current/25 px-2.5 py-0.5 text-[0.7rem]">
+                {t.name}
+              </li>
+            ))}
+            {project.technologies.length > 3 && (
+              <li className="rounded-full px-1.5 py-0.5 text-[0.7rem] text-muted">+{project.technologies.length - 3}</li>
+            )}
+          </ul>
+        )}
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <ProjectLinks repoUrl={project.repoUrl} liveUrl={project.liveUrl} title={project.title} size="sm" />
+          <ArrowUpRight className="size-5 shrink-0 text-muted" aria-hidden />
+        </div>
       </article>
     </motion.li>
   );

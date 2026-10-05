@@ -29,7 +29,7 @@ export function ProfileForm({ profile, uploadEnabled }: { profile: Profile; uplo
         <Field label="Titular" name="headline" errors={errors} hint="Frase corta bajo tu nombre en el Hero.">
           <input {...fieldProps("headline", errors)} defaultValue={profile.headline ?? ""} className={inputClass} />
         </Field>
-        <Field label="Biografía" name="bio" errors={errors} hint="Se revela palabra por palabra en la sección Sobre mí.">
+        <Field label="Biografía" name="bio" errors={errors} hint="Separa los párrafos con una línea en blanco. El primero se destaca en grande en Sobre mí; el resto se muestra como texto normal.">
           <textarea {...fieldProps("bio", errors)} defaultValue={profile.bio ?? ""} rows={6} className={inputClass} />
         </Field>
         <Switch name="isAvailable" label="Disponible para proyectos" description='Muestra el badge con pulso en el Hero.' defaultChecked={profile.isAvailable} />

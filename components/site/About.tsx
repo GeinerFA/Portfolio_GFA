@@ -18,31 +18,50 @@ export function About({ profile, stats }: { profile: Profile; stats: AboutStats 
     { value: stats.years, label: stats.years === 1 ? "Año creando" : "Años creando" },
   ];
 
+  // Párrafos separados por una línea en blanco (acepta saltos \n y \r\n).
+  const [lead, ...paragraphs] = (profile.bio ?? "")
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
   return (
     <section id="sobre-mi" className="container-x scroll-mt-24 py-24 md:py-36">
       <SectionHeading index="04" eyebrow="Perfil" title="Sobre mí" />
 
-      <div className="mt-14 grid gap-12 md:mt-20 md:grid-cols-12">
+      <div className="mt-14 grid gap-12 md:mt-20 md:grid-cols-12 md:gap-16">
         {profile.avatarUrl && (
-          <Reveal className="md:col-span-4">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-ink-3">
-              <Image
-                src={profile.avatarUrl}
-                alt={profile.fullName}
-                fill
-                sizes="(min-width: 768px) 33vw, 100vw"
-                className="object-cover grayscale transition-[filter] duration-700 hover:grayscale-0"
-              />
-            </div>
-          </Reveal>
+          // En desktop la foto queda fija mientras se lee la biografía.
+          <div className="md:sticky md:top-28 md:col-span-4 md:self-start">
+            <Reveal>
+              <div className="relative mx-auto aspect-[4/5] max-w-sm overflow-hidden rounded-3xl bg-ink-3 md:max-w-none">
+                <Image
+                  src={profile.avatarUrl}
+                  alt={profile.fullName}
+                  fill
+                  sizes="(min-width: 768px) 33vw, 100vw"
+                  className="object-cover grayscale transition-[filter] duration-700 hover:grayscale-0"
+                />
+              </div>
+            </Reveal>
+          </div>
         )}
 
         <div className={profile.avatarUrl ? "md:col-span-8" : "md:col-span-10 md:col-start-2"}>
-          {profile.bio && (
+          {/* Primer párrafo destacado (se revela palabra por palabra); el resto, en tamaño de lectura. */}
+          {lead && (
             <ScrollRevealText
-              text={profile.bio}
-              className="text-display text-[clamp(1.6rem,3.4vw,3.25rem)] font-medium leading-[1.12] tracking-tight"
+              text={lead}
+              className="text-display text-[clamp(1.5rem,2.6vw,2.5rem)] font-medium leading-[1.2] tracking-tight"
             />
+          )}
+          {paragraphs.length > 0 && (
+            <div className="mt-10 flex max-w-2xl flex-col gap-5 text-base leading-relaxed text-paper/70 md:text-lg">
+              {paragraphs.map((p, i) => (
+                <Reveal key={i} y={20}>
+                  <p>{p}</p>
+                </Reveal>
+              ))}
+            </div>
           )}
 
           <dl className="mt-16 grid grid-cols-3 gap-4 border-t border-line pt-8">
