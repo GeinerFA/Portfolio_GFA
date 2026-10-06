@@ -20,33 +20,38 @@ function readConfig() {
 
 export const isCloudinaryConfigured = () => readConfig() !== null;
 
-export const UPLOAD_FOLDERS = {
-  avatar: "portfolio/perfil",
-  projects: "portfolio/proyectos",
+/** Destinos de subida: carpeta en Cloudinary + tipo de recurso. */
+export const UPLOAD_TARGETS = {
+  avatar: { folder: "portfolio/perfil", resource: "image" },
+  projects: { folder: "portfolio/proyectos", resource: "image" },
+  // Los PDF se suben como "raw" (documento): como "image", Cloudinary bloquea la entrega de PDF por defecto.
+  cv: { folder: "portfolio/cv", resource: "raw" },
 } as const;
-export type UploadFolder = keyof typeof UPLOAD_FOLDERS;
+export type UploadTarget = keyof typeof UPLOAD_TARGETS;
 
-export const ALLOWED_FORMATS = "jpg,jpeg,png,webp,avif,gif";
+export const ALLOWED_IMAGE_FORMATS = "jpg,jpeg,png,webp,avif,gif";
 
 export interface UploadSignature {
   uploadUrl: string;
   apiKey: string;
-  timestamp: number;
   signature: string;
-  folder: string;
-  allowedFormats: string;
+  /** Parámetros firmados que el navegador debe enviar tal cual junto al archivo. */
+  params: Record<string, string>;
 }
 
 /** Firma los parámetros de subida (SHA-1 de los parámetros ordenados + API secret). */
-export function createUploadSignature(folder: UploadFolder): UploadSignature | null {
+export function createUploadSignature(target: UploadTarget): UploadSignature | null {
   const config = readConfig();
   if (!config) return null;
 
-  const timestamp = Math.floor(Date.now() / 1000);
-  const params: Record<string, string | number> = {
-    allowed_formats: ALLOWED_FORMATS,
-    folder: UPLOAD_FOLDERS[folder],
-    timestamp,
+  const { folder, resource } = UPLOAD_TARGETS[target];
+  const params: Record<string, string> = {
+    folder,
+    timestamp: String(Math.floor(Date.now() / 1000)),
+    ...(resource === "image"
+      ? { allowed_formats: ALLOWED_IMAGE_FORMATS }
+      : // En "raw" el nombre público conserva la extensión (…/cv-xxxx.pdf).
+        { use_filename: "true", unique_filename: "true" }),
   };
   const toSign = Object.keys(params)
     .sort()
@@ -55,11 +60,9 @@ export function createUploadSignature(folder: UploadFolder): UploadSignature | n
   const signature = createHash("sha1").update(toSign + config.apiSecret).digest("hex");
 
   return {
-    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloudName}/${resource}/upload`,
     apiKey: config.apiKey,
-    timestamp,
     signature,
-    folder: UPLOAD_FOLDERS[folder],
-    allowedFormats: ALLOWED_FORMATS,
+    params,
   };
 }

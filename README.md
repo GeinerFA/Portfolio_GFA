@@ -180,6 +180,8 @@ En **Perfil → Foto de perfil** y en la **portada** de cada proyecto hay un bot
 
 - El archivo se sube **directo desde el navegador a Cloudinary**, con una firma que genera el servidor y que solo el admin puede pedir. Se guarda en las carpetas `portfolio/perfil` o `portfolio/proyectos`.
 - Se aceptan JPG, PNG, WebP, AVIF y GIF, de hasta 10 MB.
+- **CV en PDF:** en **Perfil → CV** hay un botón **Subir PDF** (hasta 10 MB; se guarda en `portfolio/cv`).
+  > ⚠️ Cloudinary bloquea por defecto la descarga pública de PDF. Actívala en **Settings → Security → "Allow delivery of PDF and ZIP files"**. Si no lo haces, el admin te avisa después de subir el archivo.
 - Después de subir, pulsa **Guardar**. Las imágenes reemplazadas no se borran de Cloudinary; puedes eliminarlas desde su Media Library.
 
 ---

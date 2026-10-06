@@ -10,7 +10,7 @@ import { NextProject } from "@/components/site/NextProject";
 import { ProjectCover } from "@/components/site/ProjectCover";
 import { ProjectLinks } from "@/components/site/ProjectLinks";
 import { TechIcon } from "@/components/site/TechIcon";
-import { accentOf, normalizeHex } from "@/lib/color";
+import { normalizeHex } from "@/lib/color";
 import { getProjectBySlug, getSiteData } from "@/lib/data/queries";
 
 export const revalidate = 3600;
@@ -44,7 +44,6 @@ export default async function ProjectPage({ params }: Props) {
   const result = await getProjectBySlug(slug);
   if (!result) notFound();
   const { project, next } = result;
-  const accent = accentOf(project.accentColor);
   const paragraphs = project.description.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 
   return (
@@ -71,10 +70,9 @@ export default async function ProjectPage({ params }: Props) {
               <dd className="mt-2 text-lg">{project.year}</dd>
             </div>
             <div>
-              <dt className="font-mono text-xs uppercase tracking-[0.2em] text-muted">Color</dt>
-              <dd className="mt-2 flex items-center gap-2 text-lg">
-                <span className="size-4 rounded-full" style={{ background: accent }} />
-                <span className="font-mono text-sm uppercase">{accent}</span>
+              <dt className="font-mono text-xs uppercase tracking-[0.2em] text-muted">Stack</dt>
+              <dd className="mt-2 text-lg">
+                {project.technologies.length} {project.technologies.length === 1 ? "tecnología" : "tecnologías"}
               </dd>
             </div>
           </dl>

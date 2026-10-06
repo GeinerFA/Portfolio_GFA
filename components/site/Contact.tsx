@@ -16,7 +16,7 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
           <span className="text-accent">05</span> — Contacto
         </p>
 
-        <h2 className="text-display mt-6 text-[clamp(4.5rem,21vw,22rem)] leading-[0.85]">
+        <h2 className="text-display mt-6 text-[clamp(3.5rem,14vw,14rem)] leading-[0.85]">
           <SplitText text="Hablemos" stagger={0.05} />
         </h2>
 

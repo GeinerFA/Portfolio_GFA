@@ -47,20 +47,16 @@ export function ProfileForm({ profile, uploadEnabled }: { profile: Profile; uplo
         />
       </Card>
 
-      <Card title="CV">
-        <Field
-          label="Link del CV"
+      <Card title="CV" description="Se descarga con los botones «Descargar CV» de la navbar y de Sobre mí.">
+        <ImageUrlField
           name="cvUrl"
+          label="Currículum (PDF)"
+          kind="pdf"
+          defaultValue={profile.cvUrl}
           errors={errors}
-          hint={
-            <>
-              Un PDF en <code>/public</code> (ej. <code>/cv.pdf</code>) o un link de Google Drive (compártelo como
-              &quot;Cualquier persona con el enlace&quot;; se convierte en descarga directa). Vacío = se oculta el botón.
-            </>
-          }
-        >
-          <input {...fieldProps("cvUrl", errors)} defaultValue={profile.cvUrl ?? ""} placeholder="/cv.pdf o https://drive.google.com/…" className={inputClass} />
-        </Field>
+          upload={{ folder: "cv", enabled: uploadEnabled }}
+          hint="Sube tu PDF o pega un link (ruta de /public como /cv.pdf, o Google Drive compartido como «Cualquier persona con el enlace»). Vacío = se ocultan los botones."
+        />
       </Card>
 
       <FormMessage state={state} />

@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ImageOff, Loader2, Plus, Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, FileText, ImageOff, Loader2, Plus, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ActionState } from "@/lib/actions/state";
 import { getUploadSignature } from "@/lib/actions/uploads";
-import { slugify } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
 import { Field, fieldProps, inputClass } from "./form";
 
 /** Título + slug. El slug se genera solo hasta que el usuario lo edita a mano. */
@@ -87,8 +87,8 @@ export function ImageUrlField({
   defaultValue?: string | null;
   hint?: string;
   errors?: ActionState["errors"];
-  kind?: "image" | "video";
-  /** Si se indica, muestra el botón "Subir imagen" (Cloudinary) y guarda en esa carpeta. */
+  kind?: "image" | "video" | "pdf";
+  /** Si se indica, muestra el botón de subida (Cloudinary) hacia ese destino. */
   upload?: { folder: UploadFolderKey; enabled: boolean };
   /** "portrait" muestra una vista previa grande 4:5 (ideal para la foto de perfil). */
   preview?: "thumb" | "portrait";
@@ -98,7 +98,9 @@ export function ImageUrlField({
   const show = url && isPreviewable(url);
 
   const media =
-    show && !broken ? (
+    kind === "pdf" ? (
+      <FileText className={cn("size-6", url ? "text-accent" : "text-muted")} aria-hidden />
+    ) : show && !broken ? (
       kind === "video" ? (
         <video src={url} muted playsInline className="size-full object-cover" onError={() => setBroken(true)} />
       ) : (
@@ -152,14 +154,21 @@ export function ImageUrlField({
               </button>
             )}
           </div>
-          {upload && kind === "image" && <UploadButton folder={upload.folder} enabled={upload.enabled} onUploaded={setUploaded} />}
+          {upload && kind !== "video" && (
+            <UploadButton folder={upload.folder} enabled={upload.enabled} accept={kind} onUploaded={setUploaded} />
+          )}
+          {kind === "pdf" && url && isPreviewable(url) && (
+            <a href={url} target="_blank" rel="noopener noreferrer" className="w-fit text-xs text-paper/70 underline hover:text-paper">
+              Abrir el PDF actual
+            </a>
+          )}
         </div>
       </div>
     </Field>
   );
 }
 
-type UploadFolderKey = "avatar" | "projects";
+type UploadFolderKey = "avatar" | "projects" | "cv";
 
 const MAX_UPLOAD_MB = 10;
 
@@ -167,9 +176,11 @@ const MAX_UPLOAD_MB = 10;
 function UploadButton({
   folder,
   enabled,
+  accept,
   onUploaded,
 }: {
   folder: UploadFolderKey;
+  accept: "image" | "pdf";
   enabled: boolean;
   onUploaded: (url: string) => void;
 }) {
@@ -181,8 +192,11 @@ function UploadButton({
   const handleFile = async (file: File) => {
     setError(null);
     setDone(false);
-    if (!file.type.startsWith("image/")) return setError("El archivo debe ser una imagen (JPG, PNG, WebP, AVIF o GIF).");
-    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) return setError(`La imagen supera ${MAX_UPLOAD_MB} MB.`);
+    const isPdf = accept === "pdf";
+    if (isPdf ? file.type !== "application/pdf" : !file.type.startsWith("image/")) {
+      return setError(isPdf ? "El archivo debe ser un PDF." : "El archivo debe ser una imagen (JPG, PNG, WebP, AVIF o GIF).");
+    }
+    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) return setError(`El archivo supera ${MAX_UPLOAD_MB} MB.`);
 
     setProgress(0);
     const signed = await getUploadSignature(folder);
@@ -194,10 +208,9 @@ function UploadButton({
     const body = new FormData();
     body.append("file", file);
     body.append("api_key", signed.data.apiKey);
-    body.append("timestamp", String(signed.data.timestamp));
     body.append("signature", signed.data.signature);
-    body.append("folder", signed.data.folder);
-    body.append("allowed_formats", signed.data.allowedFormats);
+    // Los parámetros firmados se envían tal cual (deben coincidir con la firma).
+    for (const [key, value] of Object.entries(signed.data.params)) body.append(key, value);
 
     // XMLHttpRequest para poder mostrar el progreso de la subida.
     const xhr = new XMLHttpRequest();
@@ -210,8 +223,22 @@ function UploadButton({
         if (xhr.status >= 200 && xhr.status < 300 && res.secure_url) {
           onUploaded(res.secure_url);
           setDone(true);
+          // Cloudinary bloquea la entrega de PDF por defecto: se comprueba que el archivo sea descargable.
+          if (accept === "pdf") {
+            const url = res.secure_url;
+            void fetch(url, { method: "HEAD" })
+              .then((r) => r.ok)
+              .catch(() => false)
+              .then((ok) => {
+                if (!ok) {
+                  setError(
+                    "El PDF se subió, pero Cloudinary no permite descargarlo. En Cloudinary → Settings → Security, activa «Allow delivery of PDF and ZIP files» y guarda.",
+                  );
+                }
+              });
+          }
         } else {
-          setError(res.error?.message ?? "Cloudinary rechazó la imagen.");
+          setError(res.error?.message ?? "Cloudinary rechazó el archivo.");
         }
       } catch {
         setError("Respuesta inválida de Cloudinary.");
@@ -238,7 +265,7 @@ function UploadButton({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+        accept={accept === "pdf" ? "application/pdf" : "image/jpeg,image/png,image/webp,image/avif,image/gif"}
         className="sr-only"
         tabIndex={-1}
         onChange={(e) => {
@@ -255,16 +282,18 @@ function UploadButton({
           className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-paper/90 transition-colors hover:border-paper/50 disabled:cursor-wait disabled:opacity-60"
         >
           {uploading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Upload className="size-4" aria-hidden />}
-          {uploading ? `Subiendo… ${progress}%` : "Subir imagen"}
+          {uploading ? `Subiendo… ${progress}%` : accept === "pdf" ? "Subir PDF" : "Subir imagen"}
         </button>
-        <span className="text-xs text-muted">JPG, PNG, WebP, AVIF o GIF · máx. {MAX_UPLOAD_MB} MB</span>
+        <span className="text-xs text-muted">
+          {accept === "pdf" ? "PDF" : "JPG, PNG, WebP, AVIF o GIF"} · máx. {MAX_UPLOAD_MB} MB
+        </span>
       </div>
       {uploading && (
         <div className="h-1 w-full overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
           <div className="h-full bg-accent transition-[width]" style={{ width: `${progress}%` }} />
         </div>
       )}
-      {done && <p className="text-xs text-accent">Imagen subida. Recuerda guardar los cambios.</p>}
+      {done && <p className="text-xs text-accent">Archivo subido. Recuerda guardar los cambios.</p>}
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
