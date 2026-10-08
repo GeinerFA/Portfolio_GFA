@@ -5,6 +5,7 @@ import { hasDatabase } from "@/lib/env";
 import { defaultSiteData } from "./defaults";
 import { loadSiteData } from "./load";
 import type { Project, SiteData } from "./types";
+import { CAREER_START_YEAR } from "./resume";
 
 /**
  * Datos públicos del sitio. Si no hay base de datos (o falla), devuelve los datos por defecto
@@ -35,11 +36,9 @@ export async function getProjectBySlug(
 }
 
 export function computeStats(data: SiteData) {
-  const years = data.projects.map((p) => p.year).filter((y): y is number => typeof y === "number");
-  const firstYear = years.length ? Math.min(...years) : new Date().getFullYear();
   return {
     projects: data.projects.length,
     technologies: data.technologies.length,
-    years: Math.max(1, new Date().getFullYear() - firstYear + 1),
+    years: Math.max(1, new Date().getFullYear() - CAREER_START_YEAR),
   };
 }

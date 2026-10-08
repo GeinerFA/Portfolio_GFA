@@ -264,7 +264,7 @@ function ProjectRow({
   );
 }
 
-export function ProjectList({ projects }: { projects: Project[] }) {
+export function ProjectList({ projects, index, title }: { projects: Project[]; index: string; title: string }) {
   const reduce = useReducedMotion();
   const [filter, setFilter] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -293,15 +293,15 @@ export function ProjectList({ projects }: { projects: Project[] }) {
   if (projects.length === 0) return null;
 
   return (
-    <section id="proyectos" className="container-x scroll-mt-24 py-24 md:py-36">
+    <section id="indice" className="container-x scroll-mt-24 py-24 md:py-36">
       <SectionHeading
-        index="03"
+        index={index}
         eyebrow="Índice"
-        title="Proyectos"
+        title={title}
         aside={<p className="font-mono text-sm text-muted">{visible.length} / {projects.length}</p>}
       />
 
-      {filters.length > 1 && (
+      {filters.length > 1 && projects.length >= 3 && (
         <LayoutGroup id="project-filters">
           <div role="group" aria-label="Filtrar por tecnología" className="mt-12 flex flex-wrap gap-2">
             {[{ slug: null, name: "Todos", count: projects.length }, ...filters.map((f) => ({ slug: f.tech.slug, name: f.tech.name, count: f.count }))].map(

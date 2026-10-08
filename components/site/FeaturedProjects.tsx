@@ -11,6 +11,8 @@ import { ProjectCover } from "./ProjectCover";
 import { ProjectLinks } from "./ProjectLinks";
 import { SectionHeading } from "./SectionHeading";
 
+const MAX_CHIPS = 5;
+
 /**
  * Tarjeta horizontal: imagen 16:10 (la proporción de una pantalla, así la captura del sitio se ve completa)
  * + información al lado. La altura de la imagen se limita para que la tarjeta quepa en la pantalla.
@@ -25,12 +27,16 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
   const reversed = index % 2 === 1;
 
   return (
-    <motion.article ref={ref} style={{ y }} className="group relative">
+    <motion.article
+      ref={ref}
+      style={{ y, ["--glow" as string]: `color-mix(in srgb, ${accent} 35%, transparent)` }}
+      className="group relative"
+    >
       <div className={cn("grid items-center gap-6 md:grid-cols-12 md:gap-10", reversed && "md:[direction:rtl]")}>
         {/* Imagen */}
         <div className="md:col-span-7 md:[direction:ltr]">
-          <div className="relative mx-auto aspect-[16/10] w-full max-w-[calc(70svh*1.6)] overflow-hidden rounded-2xl border border-line bg-ink-3 md:rounded-3xl">
-            <div className="absolute inset-0 transition-transform duration-[1.2s] ease-out-expo group-hover:scale-[1.03]">
+          <div className="relative mx-auto aspect-[16/10] w-full max-w-[calc(70svh*1.6)] overflow-hidden rounded-2xl border border-line bg-ink-3 transition-[border-color,box-shadow] duration-700 group-hover:border-paper/20 group-hover:shadow-[0_30px_80px_-30px_var(--glow)] md:rounded-3xl">
+            <div className="absolute inset-0 transition-transform duration-[1.6s] ease-out-expo group-hover:scale-[1.06]">
               <ProjectCover
                 title={project.title}
                 coverUrl={project.coverUrl}
@@ -64,11 +70,19 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
 
           {project.technologies.length > 0 && (
             <ul className="mt-6 flex flex-wrap gap-2">
-              {project.technologies.map((t) => (
+              {project.technologies.slice(0, MAX_CHIPS).map((t) => (
                 <li key={t.id} className="rounded-full border border-line px-3 py-1 text-xs text-paper/70">
                   {t.name}
                 </li>
               ))}
+              {project.technologies.length > MAX_CHIPS && (
+                <li
+                  className="rounded-full border border-line px-3 py-1 font-mono text-xs text-muted"
+                  title={project.technologies.slice(MAX_CHIPS).map((t) => t.name).join(", ")}
+                >
+                  +{project.technologies.length - MAX_CHIPS}
+                </li>
+              )}
             </ul>
           )}
 
@@ -85,11 +99,11 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export function FeaturedProjects({ projects }: { projects: Project[] }) {
+export function FeaturedProjects({ projects, index }: { projects: Project[]; index: string }) {
   if (projects.length === 0) return null;
   return (
     <section id="destacados" className="container-x py-24 md:py-36">
-      <SectionHeading index="02" eyebrow="Selección" title="Destacados" />
+      <SectionHeading index={index} eyebrow="Selección" title="Destacados" />
       <div className="mt-16 flex flex-col gap-24 md:mt-24 md:gap-32">
         {projects.map((p, i) => (
           <FeaturedCard key={p.id} project={p} index={i} />

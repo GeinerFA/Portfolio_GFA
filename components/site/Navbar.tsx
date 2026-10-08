@@ -6,13 +6,15 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/#proyectos", label: "Proyectos" },
+  { href: "/#servicios", label: "Servicios" },
   { href: "/#tecnologias", label: "Tecnologías" },
   { href: "/#sobre-mi", label: "Sobre mí" },
+  { href: "/#trayectoria", label: "Trayectoria" },
   { href: "/#contacto", label: "Contacto" },
 ];
 
@@ -25,8 +27,32 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
   const { scrollY } = useScroll();
   const lenis = useLenis();
 
+  const [active, setActive] = useState<string | null>(null);
+  const isHome = pathname === "/";
+
+  // Sección activa: la última cuyo inicio ya pasó el 40 % superior de la pantalla.
+  const updateActive = useCallback(() => {
+    if (!isHome) return setActive(null);
+    const line = window.innerHeight * 0.4;
+    let current: string | null = null;
+    for (const item of NAV) {
+      const el = document.getElementById(item.href.slice(2));
+      if (el && el.getBoundingClientRect().top <= line) current = item.href;
+    }
+    setActive(current);
+  }, [isHome]);
+
+  // Cálculo inicial (y al cambiar de página), después de que el layout esté listo.
+  useEffect(() => {
+    const frame = requestAnimationFrame(updateActive);
+    return () => cancelAnimationFrame(frame);
+  }, [updateActive]);
+
   // La barra queda siempre visible; al bajar solo gana el fondo con blur.
-  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
+  useMotionValueEvent(scrollY, "change", (y) => {
+    setScrolled(y > 24);
+    updateActive();
+  });
 
   // Cierra el menú al navegar
   const [lastPath, setLastPath] = useState(pathname);
@@ -62,13 +88,24 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
               <Image src="/logo.png" alt="" width={427} height={160} priority className="h-7 w-auto md:h-9" />
             </Link>
 
-            <ul className="hidden items-center gap-6 md:flex lg:gap-8">
+            <ul className="hidden items-center gap-5 lg:flex xl:gap-8">
               {NAV.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="group relative py-1 text-sm text-paper/70 transition-colors hover:text-paper"
+                    aria-current={active === item.href ? "location" : undefined}
+                    className={cn(
+                      "group relative flex items-center gap-2 py-1 text-sm transition-colors hover:text-paper",
+                      active === item.href ? "text-paper" : "text-paper/70",
+                    )}
                   >
+                    {active === item.href && (
+                      <motion.span
+                        layoutId="nav-active-dot"
+                        className="size-1.5 rounded-full bg-accent"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
                     {item.label}
                     <span className="absolute inset-x-0 -bottom-0.5 h-px origin-right scale-x-0 bg-paper transition-transform duration-500 ease-out-expo group-hover:origin-left group-hover:scale-x-100" />
                   </Link>
@@ -82,7 +119,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
                   href={cvUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden items-center gap-2 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent md:inline-flex"
+                  className="hidden items-center gap-2 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-accent lg:inline-flex"
                 >
                   <Download className="size-4" aria-hidden />
                   Descargar CV
@@ -93,7 +130,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
                 prefetch={false}
                 aria-label="Panel administrativo"
                 title="Panel administrativo"
-                className="hidden size-10 items-center justify-center rounded-full border border-line text-paper/70 transition-colors hover:border-paper/50 hover:text-paper md:inline-flex"
+                className="hidden size-10 items-center justify-center rounded-full border border-line text-paper/70 transition-colors hover:border-paper/50 hover:text-paper lg:inline-flex"
               >
                 <LockKeyhole className="size-4" aria-hidden />
               </Link>
@@ -103,7 +140,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
                 aria-expanded={open}
                 aria-controls="mobile-menu"
                 aria-label={open ? "Cerrar menú" : "Abrir menú"}
-                className="inline-flex size-10 items-center justify-center rounded-full border border-line md:hidden"
+                className="inline-flex size-10 items-center justify-center rounded-full border border-line lg:hidden"
               >
                 {open ? <X className="size-5" /> : <Menu className="size-5" />}
               </button>
@@ -116,7 +153,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
         {open && (
           <motion.div
             id="mobile-menu"
-            className="fixed inset-0 z-40 flex flex-col justify-between bg-ink px-4 pb-10 pt-28 md:hidden"
+            className="fixed inset-0 z-40 flex flex-col justify-between bg-ink px-4 pb-10 pt-28 lg:hidden"
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}

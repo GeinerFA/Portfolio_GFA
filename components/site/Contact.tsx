@@ -7,14 +7,14 @@ import type { Profile, SocialLink } from "@/lib/data/types";
 import { ContactForm } from "./ContactForm";
 import { SOCIAL_META, SocialIcon } from "./SocialIcon";
 
-export function Contact({ profile, socials }: { profile: Profile; socials: SocialLink[] }) {
+export function Contact({ profile, socials, index }: { profile: Profile; socials: SocialLink[]; index: string }) {
   const whatsapp = socials.find((s) => s.platform === "whatsapp");
 
   return (
     <section id="contacto" className="relative scroll-mt-24 overflow-hidden border-t border-line py-24 md:py-36">
       <div className="container-x">
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">
-          <span className="text-accent">05</span> — Contacto
+          <span className="text-accent">{index}</span> — Contacto
         </p>
 
         <h2 className="text-display mt-6 text-[clamp(3.5rem,14vw,14rem)] leading-[0.85]">
@@ -72,7 +72,7 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
                     <span className="relative flex items-center justify-between transition-colors duration-500 group-hover:text-ink">
                       <SocialIcon platform={s.platform} className="size-6" />
                       <ArrowUpRight
-                        className="size-5 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:rotate-0 md:-rotate-45"
+                        className="size-5 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1"
                         aria-hidden
                       />
                     </span>

@@ -3,10 +3,14 @@ import Image from "next/image";
 import { ClipReveal } from "@/components/motion/ClipReveal";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
+import { defaultProfile } from "@/lib/data/defaults";
 import type { Profile, SocialLink } from "@/lib/data/types";
 import { SOCIAL_META, SocialIcon } from "./SocialIcon";
 
 export function Hero({ profile, socials }: { profile: Profile; socials: SocialLink[] }) {
+  // Frase de propuesta de valor (se edita en Admin → Perfil → Titular).
+  const headline = profile.headline?.trim() || defaultProfile.headline;
+
   return (
     <section className="relative flex min-h-svh flex-col justify-end overflow-hidden pb-10 pt-32 md:pb-14">
       {/* Halo de fondo */}
@@ -15,9 +19,12 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
         className="pointer-events-none absolute -right-[20vw] -top-[20vw] size-[70vw] rounded-full opacity-[0.12] blur-[120px]"
         style={{ background: "var(--color-accent)" }}
       />
+      {/* Textura de grano sutil sobre el degradado */}
+      <div aria-hidden className="grain pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-overlay" />
 
       <div className="container-x relative">
         <div className="mb-8 flex items-end justify-between gap-6 md:mb-12">
+        <div className="flex min-w-0 flex-col gap-6 md:gap-8">
         <Reveal delay={0.2} y={20} className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           {profile.isAvailable && (
             <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-ink-2/80 px-4 py-2 text-sm">
@@ -35,6 +42,14 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
             </span>
           )}
         </Reveal>
+        {headline && (
+          <Reveal delay={0.45} y={24}>
+            <p className="text-display max-w-2xl text-[clamp(1.35rem,2.6vw,2.6rem)] font-medium leading-[1.15] text-paper/90">
+              {headline}
+            </p>
+          </Reveal>
+        )}
+        </div>
 
           {profile.avatarUrl && (
             <ClipReveal
@@ -63,13 +78,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
             <p className="text-display mt-2 text-2xl md:text-3xl">{profile.role}</p>
           </Reveal>
 
-          {profile.headline && (
-            <Reveal delay={0.7} className="md:col-span-5">
-              <p className="max-w-md text-lg leading-relaxed text-paper/70">{profile.headline}</p>
-            </Reveal>
-          )}
-
-          <Reveal delay={0.8} className="flex items-center justify-between gap-6 md:col-span-3 md:flex-col md:items-end">
+          <Reveal delay={0.8} className="flex items-center justify-between gap-6 md:col-span-4 md:col-start-9 md:flex-col md:items-end">
             {socials.length > 0 && (
               <ul className="flex gap-2" aria-label="Redes sociales">
                 {socials.map((s) => (

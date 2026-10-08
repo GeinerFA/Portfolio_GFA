@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await getSiteData();
+  const { profile, socials } = await getSiteData();
 
   return (
     <SmoothScroll>
@@ -32,7 +32,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </a>
       <Navbar name={profile.fullName} cvUrl={profile.cvUrl} />
       <main id="contenido">{children}</main>
-      <Footer name={profile.fullName} />
+      <Footer profile={profile} socials={socials} />
       <BackToTop />
     </SmoothScroll>
   );

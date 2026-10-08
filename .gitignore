@@ -11,3 +11,6 @@ next-env.d.ts
 npm-debug.log*
 drizzle
 .npmrc
+
+# Respaldos locales de la base de datos
+/backups

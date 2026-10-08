@@ -11,11 +11,11 @@ export interface AboutStats {
   years: number;
 }
 
-export function About({ profile, stats }: { profile: Profile; stats: AboutStats }) {
+export function About({ profile, stats, index }: { profile: Profile; stats: AboutStats; index: string }) {
   const items = [
     { value: stats.projects, label: "Proyectos" },
     { value: stats.technologies, label: "Tecnologías" },
-    { value: stats.years, label: stats.years === 1 ? "Año creando" : "Años creando" },
+    { value: stats.years, label: stats.years === 1 ? "Año de experiencia" : "Años de experiencia" },
   ];
 
   // Párrafos separados por una línea en blanco (acepta saltos \n y \r\n).
@@ -26,7 +26,7 @@ export function About({ profile, stats }: { profile: Profile; stats: AboutStats 
 
   return (
     <section id="sobre-mi" className="container-x scroll-mt-24 py-24 md:py-36">
-      <SectionHeading index="04" eyebrow="Perfil" title="Sobre mí" />
+      <SectionHeading index={index} eyebrow="Perfil" title="Sobre mí" />
 
       <div className="mt-14 grid gap-12 md:mt-20 md:grid-cols-12 md:gap-16">
         {profile.avatarUrl && (

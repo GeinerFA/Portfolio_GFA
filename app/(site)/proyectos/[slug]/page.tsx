@@ -39,6 +39,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/**
+ * Bloque de la descripción (separados por una línea en blanco). Formato mínimo:
+ * "## Título" → subtítulo; líneas que empiezan con "- " → lista; lo demás → párrafo.
+ */
+function DescriptionBlock({ block }: { block: string }) {
+  const lines = block.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const heading = lines[0]?.startsWith("## ") ? lines.shift()!.slice(3) : null;
+  const items = lines.filter((l) => l.startsWith("- ")).map((l) => l.slice(2));
+  const isList = items.length > 0 && items.length === lines.length;
+
+  return (
+    <div className={heading ? "pt-4" : undefined}>
+      {heading && <h3 className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-accent">{heading}</h3>}
+      {isList ? (
+        <ul className="flex flex-col gap-3 text-base md:text-lg">
+          {items.map((item, i) => (
+            <li key={i} className="flex gap-3">
+              <span className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-paper/40" aria-hidden />
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        lines.length > 0 && <p className="whitespace-pre-line">{lines.join("\n")}</p>
+      )}
+    </div>
+  );
+}
+
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
   const result = await getProjectBySlug(slug);
@@ -146,8 +175,8 @@ export default async function ProjectPage({ params }: Props) {
           {paragraphs.length > 0 && (
             <div className="mt-10 flex flex-col gap-6 text-lg leading-relaxed text-paper/70">
               {paragraphs.map((p, i) => (
-                <Reveal key={i} delay={i * 0.05}>
-                  <p className="whitespace-pre-line">{p}</p>
+                <Reveal key={i} delay={Math.min(i, 6) * 0.04}>
+                  <DescriptionBlock block={p} />
                 </Reveal>
               ))}
             </div>

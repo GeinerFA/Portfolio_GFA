@@ -29,8 +29,8 @@ export function ProjectForm({
           <Field label="Resumen" name="summary" errors={errors} hint="Una línea. Se muestra en la lista y en las tarjetas.">
             <input {...fieldProps("summary", errors)} defaultValue={project?.summary} maxLength={300} className={inputClass} />
           </Field>
-          <Field label="Descripción" name="description" errors={errors} hint="Separa párrafos con una línea en blanco.">
-            <textarea {...fieldProps("description", errors)} defaultValue={project?.description} rows={8} className={inputClass} />
+          <Field label="Descripción" name="description" errors={errors} hint={<>Separa bloques con una línea en blanco. Usa <code>## Título</code> para un subtítulo y <code>- </code> al inicio de cada línea para una lista.</>}>
+            <textarea {...fieldProps("description", errors)} defaultValue={project?.description} rows={14} className={inputClass} />
           </Field>
         </Card>
 
