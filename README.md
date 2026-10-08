@@ -93,6 +93,9 @@ Copia `.env.example` a `.env.local` y complétalo:
 | `CLOUDINARY_CLOUD_NAME` | No | Cloudinary, para subir imágenes desde el admin. Sin estas tres variables, las imágenes se cargan solo por URL. |
 | `CLOUDINARY_API_KEY` | No | API key de Cloudinary. |
 | `CLOUDINARY_API_SECRET` | No | API secret de Cloudinary (nunca se expone al navegador). |
+| `RESEND_API_KEY` | No | API key de Resend para el formulario de contacto. Sin ella el formulario muestra un aviso y no envía. |
+| `CONTACT_TO_EMAIL` | No | Correo que recibe los mensajes. Por defecto `ADMIN_EMAIL`. |
+| `CONTACT_FROM_EMAIL` | No | Remitente (requiere dominio verificado en Resend). Por defecto `Portfolio <onboarding@resend.dev>`. |
 
 > `.env` y `.env.local` están en `.gitignore`. **Nunca** subas tus secretos al repositorio.
 
@@ -183,6 +186,22 @@ En **Perfil → Foto de perfil** y en la **portada** de cada proyecto hay un bot
 - **CV en PDF:** en **Perfil → CV** hay un botón **Subir PDF** (hasta 10 MB; se guarda en `portfolio/cv`).
   > ⚠️ Cloudinary bloquea por defecto la descarga pública de PDF. Actívala en **Settings → Security → "Allow delivery of PDF and ZIP files"**. Si no lo haces, el admin te avisa después de subir el archivo.
 - Después de subir, pulsa **Guardar**. Las imágenes reemplazadas no se borran de Cloudinary; puedes eliminarlas desde su Media Library.
+
+### Formulario de contacto (Resend)
+
+La sección **Contacto** tiene un formulario (nombre, correo, asunto opcional y mensaje). Cada envío te llega como **correo** a `CONTACT_TO_EMAIL` (o `ADMIN_EMAIL`), con *Responder a* apuntando al correo de quien escribió: solo tienes que darle a "Responder".
+
+**Configurar Resend:**
+
+1. Crea una cuenta gratis en [resend.com](https://resend.com) **con el mismo correo donde quieres recibir los mensajes** (plan gratis: 3.000 correos/mes).
+2. En **API Keys → Create API Key** (permiso *Sending access*), copia la clave.
+3. Agrégala a `.env.local` y en Vercel como `RESEND_API_KEY`. Reinicia el servidor o vuelve a desplegar.
+
+> Sin dominio propio, Resend usa el remitente `onboarding@resend.dev`, que **solo entrega al correo de tu cuenta de Resend**. Si quieres recibir en otro correo o usar un remitente propio (`contacto@tudominio.com`), verifica tu dominio en **Resend → Domains** y define `CONTACT_FROM_EMAIL`.
+
+**Protección anti-spam:** campo oculto (*honeypot*), bloqueo de envíos instantáneos (menos de 3 s) y un límite de 5 mensajes cada 10 minutos por IP.
+
+Para recibir la **notificación en el celular**, activa las notificaciones de la app de Gmail (o tu cliente de correo) para la bandeja principal; los mensajes llegan con el asunto "Nuevo mensaje de …".
 
 ---
 

@@ -4,6 +4,7 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
 import type { Profile, SocialLink } from "@/lib/data/types";
+import { ContactForm } from "./ContactForm";
 import { SOCIAL_META, SocialIcon } from "./SocialIcon";
 
 export function Contact({ profile, socials }: { profile: Profile; socials: SocialLink[] }) {
@@ -20,8 +21,11 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
           <SplitText text="Hablemos" stagger={0.05} />
         </h2>
 
-        <div className="mt-14 flex flex-col gap-10 md:mt-20 md:flex-row md:items-center md:justify-between">
-          <Reveal className="flex flex-wrap items-center gap-6">
+        <div className="mt-14 grid gap-16 md:mt-20 lg:grid-cols-12 lg:gap-10">
+          <Reveal className="flex flex-col items-start gap-8 lg:col-span-5">
+            <p className="max-w-sm text-lg leading-relaxed text-paper/70">
+              ¿Tienes un proyecto en mente o una propuesta? Escríbeme por aquí y te respondo lo antes posible.
+            </p>
             {whatsapp && (
               <Magnetic strength={0.4}>
                 <a
@@ -47,6 +51,9 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
                 </span>
               </a>
             )}
+          </Reveal>
+          <Reveal delay={0.1} className="lg:col-span-7">
+            <ContactForm />
           </Reveal>
         </div>
 

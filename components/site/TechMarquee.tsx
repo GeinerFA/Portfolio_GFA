@@ -35,11 +35,8 @@ export function TechMarquee({ technologies }: { technologies: Technology[] }) {
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
             {base.map((tech, i) => (
-              <li key={`${tech.id}-${i}`} className="flex items-center text-paper/80">
+              <li key={`${tech.id}-${i}`} className="flex items-center pr-12 text-paper/80 md:pr-20">
                 <Item tech={tech} />
-                <span aria-hidden className="mx-8 text-accent md:mx-12">
-                  ✦
-                </span>
               </li>
             ))}
           </ul>

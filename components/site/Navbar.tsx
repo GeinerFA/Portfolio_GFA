@@ -21,16 +21,12 @@ const ease = [0.76, 0, 0.24, 1] as const;
 export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const lenis = useLenis();
 
-  useMotionValueEvent(scrollY, "change", (y) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setScrolled(y > 24);
-    setHidden(y > 400 && y > prev && !open);
-  });
+  // La barra queda siempre visible; al bajar solo gana el fondo con blur.
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
 
   // Cierra el menú al navegar
   const [lastPath, setLastPath] = useState(pathname);
@@ -52,11 +48,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
 
   return (
     <>
-      <motion.header
-        className="fixed inset-x-0 top-0 z-50"
-        animate={{ y: hidden ? "-100%" : "0%" }}
-        transition={{ duration: 0.5, ease }}
-      >
+      <header className="fixed inset-x-0 top-0 z-50">
         <div
           className={cn(
             "transition-[background-color,border-color,backdrop-filter] duration-500",
@@ -118,7 +110,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
             </div>
           </nav>
         </div>
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {open && (
