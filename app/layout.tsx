@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: { default: "Portafolio", template: "%s — Portafolio" },
   description: "Portafolio personal de proyectos.",
   applicationName: "GFA",
+  // Ícono de la pantalla de inicio en iOS (iOS ignora los íconos del manifiesto). Archivo fijo en /public,
+  // en la ruta estándar y sin query string; PNG opaco, porque iOS pinta de negro las transparencias.
+  // Al declarar `icons`, Next deja de agregar el de app/icon.png: por eso el favicon también va aquí.
+  icons: {
+    icon: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   // Al instalarla en iOS ("Agregar a pantalla de inicio") abre a pantalla completa, como app.
   appleWebApp: { capable: true, title: "GFA", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false },
