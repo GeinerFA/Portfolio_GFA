@@ -57,17 +57,20 @@
   }
 }
 
-/*
- * App instalada (PWA): sin zoom por pellizco ni doble toque; el desplazamiento sigue funcionando.
- * La media query aplica desde el primer pintado; la clase `standalone` (StandaloneZoomLock) cubre iOS.
- */
-@media (display-mode: standalone) {
-  html {
-    touch-action: pan-x pan-y;
-  }
-}
-html.standalone {
+/* Sin zoom por pellizco ni doble toque en todo el sitio; el desplazamiento sigue funcionando (ver ZoomLock). */
+html {
   touch-action: pan-x pan-y;
+}
+
+/*
+ * Sin scroll horizontal en la página: lo que se salga de lado (halos, marquee, animaciones) se recorta.
+ * `clip` en lugar de `hidden` para no crear un contenedor de scroll, que rompería los elementos `sticky`.
+ * Las tablas o listas con scroll horizontal propio (overflow-x-auto) siguen funcionando.
+ */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /*

@@ -3,7 +3,7 @@ import { fontDisplay, fontMono, fontSans } from "@/lib/fonts";
 import { siteUrl } from "@/lib/site";
 import { touchIcon } from "@/lib/touch-icon";
 import { ServiceWorker } from "@/components/site/ServiceWorker";
-import { StandaloneZoomLock } from "@/components/site/StandaloneZoomLock";
+import { ZoomLock } from "@/components/site/ZoomLock";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,6 +29,9 @@ export const viewport: Viewport = {
   // Con la barra de estado translúcida de iOS el contenido queda debajo de ella:
   // los elementos fijos arriba usan padding con env(safe-area-inset-top).
   viewportFit: "cover",
+  // Sin zoom (ver ZoomLock): maximum-scale=1 además evita que iOS haga zoom al enfocar un campo de texto.
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <ServiceWorker />
-        <StandaloneZoomLock />
+        <ZoomLock />
       </body>
     </html>
   );

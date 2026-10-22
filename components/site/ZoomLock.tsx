@@ -2,38 +2,22 @@
 
 import { useEffect } from "react";
 
-const isStandalone = () =>
-  window.matchMedia("(display-mode: standalone)").matches ||
-  // iOS (Safari) expone la app instalada en la pantalla de inicio con esta propiedad.
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
-
+const GESTURES = ["gesturestart", "gesturechange", "gestureend"];
 const prevent = (event: Event) => event.preventDefault();
 
 /**
- * Bloquea el zoom solo cuando el sitio corre como app instalada (en el navegador se puede seguir haciendo zoom).
- * El bloqueo va en tres capas, porque iOS ignora `user-scalable=no` por sí solo:
- * - viewport con maximum-scale=1 (también evita el zoom automático de iOS al enfocar un input);
- * - `touch-action: pan-x pan-y` en globals.css (clase `standalone`): sin pellizco ni doble toque;
- * - los eventos `gesture*` de Safari, que son los del pellizco.
+ * Sin zoom en todo el sitio (navegador y app instalada). iOS ignora `user-scalable=no` por sí solo,
+ * así que el bloqueo va en capas:
+ * - viewport con maximum-scale=1 y user-scalable=no (app/layout.tsx): también evita el zoom de iOS al enfocar un campo;
+ * - campos de texto de al menos 16 px en móvil: con menos, iOS hace zoom al enfocarlos;
+ * - `touch-action: pan-x pan-y` en globals.css: sin pellizco ni doble toque;
+ * - aquí, los eventos `gesture*` de Safari, que son los del pellizco.
  */
-export function StandaloneZoomLock() {
+export function ZoomLock() {
   useEffect(() => {
-    if (!isStandalone()) return;
-
-    const root = document.documentElement;
-    root.classList.add("standalone");
-
-    const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
-    const original = viewport?.content;
-    if (viewport) viewport.content = `${original}, maximum-scale=1, user-scalable=no`;
-
-    const options = { passive: false } as const;
-    for (const type of ["gesturestart", "gesturechange", "gestureend"]) document.addEventListener(type, prevent, options);
-
+    for (const type of GESTURES) document.addEventListener(type, prevent, { passive: false });
     return () => {
-      root.classList.remove("standalone");
-      if (viewport && original !== undefined) viewport.content = original;
-      for (const type of ["gesturestart", "gesturechange", "gestureend"]) document.removeEventListener(type, prevent);
+      for (const type of GESTURES) document.removeEventListener(type, prevent);
     };
   }, []);
 

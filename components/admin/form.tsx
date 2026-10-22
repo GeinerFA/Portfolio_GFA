@@ -6,7 +6,7 @@ import { initialState, type ActionState } from "@/lib/actions/state";
 import { cn } from "@/lib/utils";
 
 export const inputClass =
-  "w-full rounded-xl border border-line bg-ink-2 px-3.5 py-2.5 text-sm text-paper placeholder:text-muted/70 outline-none transition-colors focus:border-paper/60 focus:ring-2 focus:ring-paper/10 aria-invalid:border-red-400/70";
+  "w-full rounded-xl border border-line bg-ink-2 px-3.5 py-2.5 text-base text-paper placeholder:text-muted/70 outline-none md:text-sm transition-colors focus:border-paper/60 focus:ring-2 focus:ring-paper/10 aria-invalid:border-red-400/70";
 
 export function Field({
   label,

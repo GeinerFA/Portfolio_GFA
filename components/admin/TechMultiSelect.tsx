@@ -61,7 +61,7 @@ export function TechMultiSelect({ technologies, defaultSelected }: { technologie
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar tecnología…"
               aria-label="Buscar tecnología"
-              className="w-full bg-transparent py-2.5 text-sm outline-none"
+              className="w-full bg-transparent py-2.5 text-base outline-none md:text-sm"
             />
           </div>
           <ul className="grid max-h-64 grid-cols-1 gap-1 overflow-y-auto p-2 sm:grid-cols-2" role="group" aria-label="Tecnologías disponibles">
