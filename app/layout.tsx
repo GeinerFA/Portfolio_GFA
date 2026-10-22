@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: "Portafolio", template: "%s — Portafolio" },
   description: "Portafolio personal de proyectos.",
+  applicationName: "GFA",
+  // Al instalarla en iOS ("Agregar a pantalla de inicio") abre a pantalla completa, como app.
+  appleWebApp: { capable: true, title: "GFA", statusBarStyle: "black-translucent" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {

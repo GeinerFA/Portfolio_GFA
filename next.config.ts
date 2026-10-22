@@ -8,6 +8,20 @@ const nextConfig: NextConfig = {
     // Las imágenes se suben a Cloudinary (res.cloudinary.com) o se pegan por URL desde el admin,
     // por eso se permite cualquier host HTTPS.
     remotePatterns: [{ protocol: "https", hostname: "**" }],
+    // Las imágenes optimizadas (Cloudinary con URL versionada) no cambian: se guardan 30 días.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+  },
+  async headers() {
+    return [
+      {
+        // El service worker siempre se revisa en la red, para que las actualizaciones lleguen enseguida.
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
+    ];
   },
 };
 

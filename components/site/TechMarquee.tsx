@@ -12,7 +12,8 @@ function Item({ tech }: { tech: Technology }) {
   }
   return (
     <span className="text-display inline-flex items-center gap-4 text-[clamp(1.5rem,3.5vw,3rem)]">
-      <TechIcon name={tech.name} icon={tech.icon} className="size-[0.8em]" />
+      {/* Con `id` usa el sprite de la página: el marquee repite la lista varias veces. */}
+      <TechIcon id={tech.id} name={tech.name} icon={tech.icon} className="size-[0.8em]" />
       {tech.name}
     </span>
   );

@@ -16,12 +16,36 @@ export function resolveTechIcon(icon: string | null | undefined): IconType | nul
 
 const isUrl = (v: string) => /^(https?:)?\/\//.test(v) || v.startsWith("/");
 
+const symbolId = (id: number) => `tech-icon-${id}`;
+
+/**
+ * Sprite con cada ícono de Simple Icons una sola vez. Los <TechIcon id> de la página lo reutilizan
+ * con <use>, en lugar de repetir el SVG completo (que era la mayor parte del peso del HTML).
+ */
+export function TechIconSprite({ technologies }: { technologies: { id: number; icon: string | null }[] }) {
+  return (
+    <svg aria-hidden width="0" height="0" className="absolute">
+      {technologies.map((tech) => {
+        const Icon = resolveTechIcon(tech.icon);
+        return (
+          Icon && (
+            <symbol key={tech.id} id={symbolId(tech.id)} viewBox="0 0 24 24">
+              {createElement(Icon, { size: 24 })}
+            </symbol>
+          )
+        );
+      })}
+    </svg>
+  );
+}
+
 /**
  * Ícono de una tecnología (Server Component).
  * `icon` puede ser un nombre de Simple Icons (react-icons/si) o la URL de una imagen.
  * Si no hay ícono, muestra un badge con las iniciales del nombre.
  */
 export function TechIcon({
+  id,
   name,
   icon,
   className,
@@ -29,8 +53,17 @@ export function TechIcon({
   name: string;
   icon: string | null | undefined;
   className?: string;
+  /** Si se pasa, usa el ícono del <TechIconSprite> de la página (debe estar renderizado en ella). */
+  id?: number;
 }) {
   const Icon = resolveTechIcon(icon);
+  if (Icon && id !== undefined) {
+    return (
+      <svg aria-hidden viewBox="0 0 24 24" className={cn("size-5 shrink-0", className)}>
+        <use href={`#${symbolId(id)}`} />
+      </svg>
+    );
+  }
   // Búsqueda en un índice estático (no crea componentes nuevos).
   if (Icon) return createElement(Icon, { className: cn("size-5 shrink-0", className), "aria-hidden": true });
 

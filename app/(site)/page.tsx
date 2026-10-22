@@ -5,6 +5,7 @@ import { FeaturedProjects } from "@/components/site/FeaturedProjects";
 import { Hero } from "@/components/site/Hero";
 import { ProjectList } from "@/components/site/ProjectList";
 import { Services } from "@/components/site/Services";
+import { TechIconSprite } from "@/components/site/TechIcon";
 import { TechMarquee } from "@/components/site/TechMarquee";
 import { TechSection } from "@/components/site/TechSection";
 import { computeStats, getSiteData } from "@/lib/data/queries";
@@ -32,6 +33,8 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Íconos de tecnologías una sola vez; el marquee y la sección de tecnologías los reutilizan. */}
+      <TechIconSprite technologies={technologies} />
       <Hero profile={profile} socials={socials} />
       <TechMarquee technologies={technologies} />
       <div id="proyectos" className="scroll-mt-16">

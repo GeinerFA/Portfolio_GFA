@@ -25,7 +25,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
       <div className="container-x relative">
         <div className="mb-8 flex items-end justify-between gap-6 md:mb-12">
         <div className="flex min-w-0 flex-col gap-6 md:gap-8">
-        <Reveal delay={0.2} y={20} className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <Reveal onLoad delay={0.2} y={20} className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           {profile.isAvailable && (
             <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-ink-2/80 px-4 py-2 text-sm">
               <span className="relative flex size-2.5">
@@ -43,7 +43,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
           )}
         </Reveal>
         {headline && (
-          <Reveal delay={0.45} y={24}>
+          <Reveal onLoad delay={0.45} y={24}>
             <p className="text-display max-w-2xl text-[clamp(1.35rem,2.6vw,2.6rem)] font-medium leading-[1.15] text-paper/90">
               {headline}
             </p>
@@ -73,12 +73,12 @@ export function Hero({ profile, socials }: { profile: Profile; socials: SocialLi
         </h1>
 
         <div className="mt-10 grid gap-10 border-t border-line pt-8 md:mt-14 md:grid-cols-12 md:items-end">
-          <Reveal delay={0.6} className="md:col-span-4">
+          <Reveal onLoad delay={0.6} className="md:col-span-4">
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">Rol</p>
             <p className="text-display mt-2 text-2xl md:text-3xl">{profile.role}</p>
           </Reveal>
 
-          <Reveal delay={0.8} className="flex items-center justify-between gap-6 md:col-span-4 md:col-start-9 md:flex-col md:items-end">
+          <Reveal onLoad delay={0.8} className="flex items-center justify-between gap-6 md:col-span-4 md:col-start-9 md:flex-col md:items-end">
             {socials.length > 0 && (
               <ul className="flex gap-2" aria-label="Redes sociales">
                 {socials.map((s) => (

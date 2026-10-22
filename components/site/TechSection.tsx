@@ -41,6 +41,7 @@ export function TechSection({ technologies, index }: { technologies: TechnologyW
                       style={{ background: "radial-gradient(120% 120% at 0% 50%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 70%)" }}
                     />
                     <TechIcon
+                      id={tech.id}
                       name={tech.name}
                       icon={tech.icon}
                       className="relative size-6 shrink-0 text-paper/70 transition-colors duration-500 group-hover:text-[var(--brand)]"

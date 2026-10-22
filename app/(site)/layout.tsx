@@ -2,6 +2,7 @@ import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { BackToTop } from "@/components/site/BackToTop";
 import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
+import { ServiceWorker } from "@/components/site/ServiceWorker";
 import type { Metadata } from "next";
 import { getSiteData } from "@/lib/data/queries";
 
@@ -34,6 +35,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="contenido">{children}</main>
       <Footer profile={profile} socials={socials} />
       <BackToTop />
+      <ServiceWorker />
     </SmoothScroll>
   );
 }

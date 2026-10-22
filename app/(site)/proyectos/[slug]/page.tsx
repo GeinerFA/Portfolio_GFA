@@ -78,7 +78,7 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <article>
       <header className="container-x pb-12 pt-32 md:pb-16 md:pt-44">
-        <Reveal y={10}>
+        <Reveal onLoad y={10}>
           <Link
             href="/#proyectos"
             className="group inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-paper"
@@ -92,7 +92,7 @@ export default async function ProjectPage({ params }: Props) {
           <SplitText text={project.title} stagger={0.025} delay={0.2} />
         </h1>
 
-        <Reveal delay={0.5} className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-12">
+        <Reveal onLoad delay={0.5} className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-12">
           <dl className="grid grid-cols-2 gap-6 md:col-span-6">
             <div>
               <dt className="font-mono text-xs uppercase tracking-[0.2em] text-muted">Año</dt>

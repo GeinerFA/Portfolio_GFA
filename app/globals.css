@@ -57,6 +57,52 @@
   }
 }
 
+/*
+ * Animaciones de entrada en CSS puro (hero y cabecera de proyectos): arrancan en cuanto llega el HTML,
+ * sin esperar a que cargue e hidrate el JavaScript. El retraso se pasa con la variable --delay.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise-y, 40px));
+  }
+}
+@keyframes letter-up {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes clip-up {
+  from {
+    clip-path: inset(100% 0% 0% 0%);
+  }
+}
+@keyframes zoom-out {
+  from {
+    transform: scale(1.25);
+  }
+}
+.anim-rise {
+  animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0s) both;
+}
+.anim-letter {
+  animation: letter-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0s) both;
+}
+.anim-clip {
+  animation: clip-up 1.3s cubic-bezier(0.76, 0, 0.24, 1) var(--delay, 0s) both;
+}
+.anim-zoom {
+  animation: zoom-out 1.8s cubic-bezier(0.76, 0, 0.24, 1) var(--delay, 0s) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-rise,
+  .anim-letter,
+  .anim-clip,
+  .anim-zoom {
+    animation: none;
+  }
+}
+
 /* Marquee infinito (CSS puro, se pausa al pasar el cursor) */
 @keyframes marquee {
   from {
