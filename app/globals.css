@@ -58,6 +58,19 @@
 }
 
 /*
+ * App instalada (PWA): sin zoom por pellizco ni doble toque; el desplazamiento sigue funcionando.
+ * La media query aplica desde el primer pintado; la clase `standalone` (StandaloneZoomLock) cubre iOS.
+ */
+@media (display-mode: standalone) {
+  html {
+    touch-action: pan-x pan-y;
+  }
+}
+html.standalone {
+  touch-action: pan-x pan-y;
+}
+
+/*
  * Animaciones de entrada en CSS puro (hero y cabecera de proyectos): arrancan en cuanto llega el HTML,
  * sin esperar a que cargue e hidrate el JavaScript. El retraso se pasa con la variable --delay.
  */

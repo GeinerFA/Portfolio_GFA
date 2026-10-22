@@ -3,6 +3,7 @@ import { fontDisplay, fontMono, fontSans } from "@/lib/fonts";
 import { siteUrl } from "@/lib/site";
 import { touchIcon } from "@/lib/touch-icon";
 import { ServiceWorker } from "@/components/site/ServiceWorker";
+import { StandaloneZoomLock } from "@/components/site/StandaloneZoomLock";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <ServiceWorker />
+        <StandaloneZoomLock />
       </body>
     </html>
   );
