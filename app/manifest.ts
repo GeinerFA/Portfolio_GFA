@@ -3,10 +3,14 @@ import { getSiteData } from "@/lib/data/queries";
 
 export const revalidate = 3600;
 
+/** Subir al cambiar los íconos (`npm run pwa:icons`): obliga a los navegadores a no usar los viejos de su caché. */
+const ICON_VERSION = 2;
+
 /** Manifiesto de la PWA (instalable en el celular y en el escritorio). */
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const { profile } = await getSiteData();
   return {
+    id: "/",
     name: `${profile.fullName} — ${profile.role}`,
     short_name: "GFA",
     description: profile.headline ?? `Portafolio de ${profile.fullName}.`,
@@ -19,10 +23,10 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     background_color: "#0a0a0a",
     theme_color: "#0a0a0a",
     icons: [
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: `/icons/icon-192.png?v=${ICON_VERSION}`, sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: `/icons/icon-512.png?v=${ICON_VERSION}`, sizes: "512x512", type: "image/png", purpose: "any" },
       // Con más margen: Android le aplica una máscara (círculo, squircle) sin recortar el logo.
-      { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: `/icons/icon-maskable-512.png?v=${ICON_VERSION}`, sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

@@ -38,7 +38,7 @@ export function AdminNav({
   return (
     <>
       {/* Barra superior en móvil */}
-      <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-ink/80 px-4 backdrop-blur lg:hidden">
+      <div className="sticky top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top,0px))] items-center justify-between border-b border-line bg-ink/80 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur lg:hidden">
         <Link href="/admin" className="text-display text-lg">
           Admin<span className="text-accent">.</span>
         </Link>
@@ -57,7 +57,7 @@ export function AdminNav({
       <aside
         id="admin-sidebar"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-ink-2 transition-transform duration-300 lg:sticky lg:top-0 lg:h-svh lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-ink-2 pt-[env(safe-area-inset-top,0px)] transition-transform duration-300 lg:sticky lg:top-0 lg:h-svh lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >

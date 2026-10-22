@@ -3,10 +3,12 @@
  * - JS/CSS/fuentes de Next (/_next/static, con hash): primero caché, nunca cambian.
  * - Imágenes (optimizadas, capturas e íconos): se sirven desde caché y se actualizan en segundo plano.
  * - Páginas: primero la red (para ver siempre lo último del admin); si tarda o no hay conexión, la caché.
+ * - Sin conexión y sin copia guardada: muestra /offline.html.
  * - El admin, la autenticación y las Server Actions nunca pasan por la caché.
  * Al cambiar la estrategia, sube VERSION para descartar las cachés anteriores.
  */
-const VERSION = "v1";
+const VERSION = "v2";
+const OFFLINE_URL = "/offline.html";
 const STATIC_CACHE = `static-${VERSION}`;
 const IMAGE_CACHE = `images-${VERSION}`;
 const PAGE_CACHE = `pages-${VERSION}`;
@@ -17,8 +19,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(PAGE_CACHE)
-      .then((cache) => cache.addAll(["/"]))
-      .catch(() => undefined)
+      .then((cache) => cache.addAll([OFFLINE_URL, "/icons/icon-192.png"]).then(() => cache.add("/").catch(() => undefined)))
       .then(() => self.skipWaiting()),
   );
 });
@@ -96,7 +97,7 @@ async function networkFirst(request) {
   try {
     return await Promise.race([network, timeout]);
   } catch {
-    return (await cache.match(request)) || (await cache.match("/")) || Response.error();
+    return (await cache.match(request)) || (await cache.match(OFFLINE_URL)) || Response.error();
   }
 }
 

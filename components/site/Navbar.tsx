@@ -82,6 +82,9 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
               ? "border-b border-line/60 bg-ink/60 backdrop-blur-xl backdrop-saturate-150"
               : "border-b border-transparent",
           )}
+          // En la app instalada en iOS el contenido queda debajo de la barra de estado (viewportFit: cover):
+          // el padding baja el menú sin dejar un hueco sin fondo arriba.
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         >
           <nav className="container-x flex h-16 items-center justify-between md:h-20" aria-label="Principal">
             <Link href="/" aria-label={`${name}, ir al inicio`} className="relative z-[60] block transition-opacity hover:opacity-80">
@@ -153,7 +156,7 @@ export function Navbar({ name, cvUrl }: { name: string; cvUrl: string | null }) 
         {open && (
           <motion.div
             id="mobile-menu"
-            className="fixed inset-0 z-40 flex flex-col justify-between bg-ink px-4 pb-10 pt-28 lg:hidden"
+            className="fixed inset-0 z-40 flex flex-col justify-between bg-ink px-4 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] pt-[calc(7rem+env(safe-area-inset-top,0px))] lg:hidden"
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}
